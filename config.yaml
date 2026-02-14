@@ -1,0 +1,117 @@
+# =================================================================
+# WheatPhenologyHRW — Centralized Configuration
+# =================================================================
+# Single source of truth for paths and study settings. Loaded via
+# `scripts/utils/config.py` → `from scripts.utils.config import CFG`.
+# =================================================================
+
+# ----- Paths -----
+# All paths are RELATIVE to the repo root and resolved via
+# scripts/utils/config.py. Raw and intermediate data are NOT
+# redistributed. Point `work_dir` / `phenology_matched` at your own
+# storage by creating a (gitignored) config.local.yaml, e.g.:
+#   paths:
+#     work_dir: /abs/path/to/processed
+# A de-identified subset for reproduction lives in data_public/.
+paths:
+  data_root:        data
+  results_root:     data/results
+
+  # Working dir holding the built sowing lookup, the DOS-anchored v3
+  # features, and v3_results/ produced by the pipeline:
+  #   01_sowing/01_build_sowing_lookup.py   -> sowing_lookup.parquet
+  #   02_features/02_build_features.py      -> features_v3_realsowing_train.parquet
+  #   03_modeling/01_phase_e_loyo.py        -> v3_results/multi_stage_*_a6_gs.*
+  work_dir:         data/processed
+
+  # Per-field, per-observation phenology labels matched to the 300 m
+  # field buffers (the modelling target source).
+  phenology_matched:  data/processed/buffer_300m/wheat_hrw_phenology_buffer_matched.parquet
+
+  # Raw inputs (HLS L8+S2, Daymet V4, MODIS LST) and spatial reference.
+  satellite_raw:    data/raw/satellite
+  daymet_full:      data/raw/satellite/daymet_daily_weather_full.csv
+  modis_lst:        data/raw/satellite/modis_lst_buffer.csv
+  states_shp:       data/external/ne_50m_admin_1_states_provinces.shp
+
+
+# ----- GEE asset (for the extraction scripts in scripts/00_extraction) -----
+gee:
+  asset:        projects/propane-primacy-481403-u3/assets/wheat_fields_buffer300m_polygons
+  drive_folder: WheatPhenologyHRW_HLS
+
+
+# ----- Study Area -----
+study_area:
+  states:       [Texas, Oklahoma, Kansas, Nebraska, Colorado]
+  state_codes:  [TX, OK, KS, NE, CO]
+  # Four training/validation growing seasons used in the manuscript:
+  # 2013/14–2016/17 (harvest years 2014–2017). 2012/13 is excluded
+  # (HLS begins 2013) and 2017/18 is held back.
+  harvest_years: [2014, 2015, 2016, 2017]
+  crop:         winter_wheat
+  variety:      Hard Red Winter Wheat
+  # Analysed cohort reported in the paper: 5,293 fields / 8,465
+  # field-years (plus a single New Mexico training field-year).
+  n_fields:     5293
+  n_field_years: 8465
+
+
+# ----- Phenology stage targets (8 stages) -----
+phenology_stages:
+  emergence:   [Emerging, Emerging - Seedling, Shoot - Emerging, Shoot,
+                Seedling, Seedling - 1 Leaf, 1 Leaf, 2 Leaf, 3 Leaf, 4 Leaf]
+  tillering:   [Begin Tillering, Tillering, 1-2 Tiller, 2-4 Tiller, 4-6 Tiller,
+                6-8 Tiller, 8+ Tiller, Full Tillering, End Tillering]
+  jointing:    [Jointing, 1st Node Visible, 2nd Node Visible, 3rd Node Visible,
+                Spring Vegetative]
+  flag_leaf:   [Flag Leaf Emerging, Flag Leaf Emerged]
+  boot:        [Early Boot, Boot]
+  heading:     [Head Emerging, Heading, Complete Heading]
+  anthesis:    [Early Bloom, Bloom]
+  # Maturity uses these labels with a DOS >= 280 plausibility filter
+  # (03_modeling/02_fix_maturity.py) that removes prior-season harvest
+  # residue; the corrected cohort gives R^2 = 0.34 (n = 357).
+  maturity:    [Maturity, Harvest Ready, Ready For Harvesting]
+
+# Spring-resumption stages: apply DOS > 200 so fall observations are
+# not captured as targets (WES predicts the spring resumption).
+spring_only_stages: [tillering, jointing]
+spring_dos_min:     200
+
+# Stages where windowed (gf/pa) features are causally invalid
+# (target observed before the window ends).
+early_stages_no_window: [emergence, tillering, jointing]
+
+
+# ----- Grain-filling & pre-anthesis windows (per harvest year) -----
+windows:
+  grain_filling:
+    start_month_day:  [4, 15]   # Apr 15
+    end_month_day:    [6, 30]   # Jun 30
+    suffix:           _gf
+  pre_anthesis:
+    start_month_day:  [3, 1]    # Mar 1
+    end_month_day:    [4, 15]   # Apr 14
+    suffix:           _pa
+
+
+# ----- ML configuration -----
+ml:
+  cv_strategy:      LOYO
+  cv_inner_folds:   5
+  bootstrap_iters:  2000
+  k_grid:           [20, 40, 60, 80, null]   # null = use all features
+  models:           [ElasticNet, Ridge, RandomForest, XGBoost, LightGBM]
+  strategies:
+    ml_only: Machine-learning only (no WES outputs among the features)
+    hybrid:  Physiology-informed — WES thermal-time outputs + ML
+
+
+# ----- Key citations -----
+references:
+  bandaru_2020:           Bandaru et al. 2020 — PhenoCrop framework
+  wang_engel_1998:        Wang & Engel 1998 — three-phase phenology model
+  streck_2003:            Streck et al. 2003 — vernalization function
+  porter_gawith_1999:     Porter & Gawith 1999 — wheat cardinal temperatures
+  mcmaster_wilhelm_1997:  McMaster & Wilhelm 1997 — GDD method 2
