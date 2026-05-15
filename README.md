@@ -17,7 +17,7 @@ A physics-informed machine learning framework that **bridges satellite-RS phenol
 
 *The physiology-informed strategy (WES + ML) yields the higher LOYO R² in seven of the eight stages. Largest gains at the reproductive transitions: ΔR² = +0.20 (flag leaf), +0.12 (boot), +0.10 (heading), +0.10 (anthesis). Tillering is the only stage where ML-only wins (ΔR² = −0.04).*
 
-> **Headline results** (LOYO CV, 5,294 fields, 8,465 field-years, 4 growing seasons 2013/14–2016/17, Hard Red Winter Wheat):
+> **Headline results** (LOYO CV, 5,293 fields, 8,465 field-years, 4 growing seasons 2013/14–2016/17, Hard Red Winter Wheat):
 > - **Anthesis**: R² = 0.80, RMSE = 4.8 d, **±10 d = 96 %**
 > - **Heading**: R² = 0.73, RMSE = 5.5 d, ±10 d = 94 %
 > - **Flag leaf**: R² = 0.71, RMSE = 5.8 d, ±10 d = 92 %
@@ -89,7 +89,7 @@ WheatPhenologyHRW/
 
 | Decision | Rationale |
 |---|---|
-| **Buffer-300m polygons** as spatial unit | Captures field + edge mixing typical of weekly observation reports; 5,294 fields / 8,465 field-years |
+| **Buffer-300m polygons** as spatial unit | Captures field + edge mixing typical of weekly observation reports; 5,293 fields / 8,465 field-years |
 | **WES** (Wang–Engel–Streck) phenology core | Wang & Engel (1998) three-phase DVS-rate formulation with Streck (2003) generalised f(V); avoids cultivar-specific parameter tuning, embeds inside a satellite-driven framework |
 | **Spring-only filter** for tillering/jointing targets (DOS > 200) | Pre-dormancy reports were biasing target — WES predicts spring resumption |
 | **Plausibility-filtered maturity labels** (DOS ≥ 280) | Drops prior-season harvest-residue observations mis-attributed to the next growing season; recovers maturity R² = 0.34 |
