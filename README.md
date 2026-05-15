@@ -3,27 +3,29 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/release/python-3130/)
 [![Tests](https://img.shields.io/badge/tests-10%20passing-brightgreen.svg)](tests/)
-[![Status](https://img.shields.io/badge/status-paper%20draft-orange.svg)](paper_draft.md)
+[![Status](https://img.shields.io/badge/status-manuscript%20pre--submission-orange.svg)](https://www.sciencedirect.com/journal/international-journal-of-applied-earth-observation-and-geoinformation)
 
-A physics-informed machine learning framework that **bridges satellite-RS phenology with established winter-wheat physiology**. The physical core is **WES** (Wang–Engel–Streck): the Wang & Engel (1998) three-phase DVS-rate phenology model with the original linear vernalization function replaced by Streck et al. (2003)'s generalised sigmoidal f(V). The component formulations are standard in process-based wheat models (APSIM, CERES, WOFOST); the contribution here is **coupling them with satellite NDVI phenology metrics inside a 5-model ML ensemble**, applied per-stage to **8 phenological stages** (emergence → maturity) across the **US Plains** (2013–2017). We retain the *spirit* of Bandaru et al. (2020)'s PhenoCrop ("RS phenology + physical model + ML") while replacing the APTT accumulator with a DVS-rate formulation that natively supports vernalization, and dropping the Kalman-filter downscaling step (no longer needed with the Harmonized Landsat–Sentinel product).
+A physics-informed machine learning framework that **bridges satellite-RS phenology with established winter-wheat physiology**. The physical core is **WES** (Wang–Engel–Streck): the Wang & Engel (1998) three-phase DVS-rate phenology model with the original linear vernalization function replaced by Streck et al. (2003)'s generalised sigmoidal f(V). The component formulations are standard in process-based wheat models (APSIM, CERES, WOFOST); the contribution here is **coupling them with satellite NDVI phenology metrics inside a 5-model ML ensemble**, applied per-stage to **8 phenological stages** (emergence → maturity) across the **US HRW belt** (training seasons 2013/14–2016/17; out-of-window inference 2018–2024). We retain the *spirit* of Bandaru et al. (2020)'s PhenoCrop ("RS phenology + physical model + ML") while replacing the APTT accumulator with a DVS-rate formulation that natively supports vernalization, and dropping the Kalman-filter downscaling step (no longer needed with the Harmonized Landsat–Sentinel product).
 
 ## Key results
 
-![Per-stage R² with 95 % bootstrap CI](docs/figures/F2_best_per_stage.png)
+![Per-stage predicted vs. observed under LOYO CV](docs/figures/F3_per_stage_scatter.png)
 
-*Best ML model per stage. R² ≥ 0.79 with ±10-day accuracy ≥ 94 % for the four critical reproductive stages (flag leaf, boot, heading, anthesis). Linear models (ElasticNet / Ridge) dominate middle stages; Random Forest wins emergence (non-linear interactions matter for fall-sown crops).*
+*Best model per stage under leave-one-year-out CV. The four reproductive stages (flag leaf, boot, heading, anthesis) reach R² = 0.69–0.80 with ±10-day accuracy 92–96 %. Linear models (ElasticNet) win the late reproductive stages; gradient-boosted trees (LightGBM / XGBoost) win the rest.*
 
-![Strategy comparison: physics vs ML vs hybrid vs WOFOST](docs/figures/F3_strategy_comparison.png)
+![Physiology-informed vs. ML-only strategy](docs/figures/F4_strategy_comparison.png)
 
-*Hybrid WES + ML (gold) consistently outperforms pure physics (WES grey, WOFOST blue) and pure ML (dark gold) for the four critical reproductive stages. WOFOST anthesis R² = 0.58 already beats WES alone (0.07), confirming the value of full process models, but the hybrid (0.81) wins overall.*
+*The physiology-informed strategy (WES + ML) yields the higher LOYO R² in seven of the eight stages. Largest gains at the reproductive transitions: ΔR² = +0.20 (flag leaf), +0.12 (boot), +0.10 (heading), +0.10 (anthesis). Tillering is the only stage where ML-only wins (ΔR² = −0.04).*
 
-> **Headline results** (LOYO CV, 6,120 fields × 5 years, Hard Red Winter Wheat):
-> - **Anthesis**: R² = 0.81, RMSE = 5.3 d, **±10 d = 95 %**
-> - **Flag leaf**: R² = 0.81, RMSE = 5.2 d, ±10 d = 94 %
-> - **Boot**: R² = 0.82, RMSE = 4.9 d, ±10 d = 96 %
-> - **Heading**: R² = 0.79, RMSE = 5.3 d, ±10 d = 95 %
-> - **Maturity** (strict labels, Ridge C-Hybrid): R² = 0.62, RMSE = 59.7 d
-> - Mean R² across all 8 stages: **0.66**
+> **Headline results** (LOYO CV, 5,294 fields, 8,465 field-years, 4 growing seasons 2013/14–2016/17, Hard Red Winter Wheat):
+> - **Anthesis**: R² = 0.80, RMSE = 4.8 d, **±10 d = 96 %**
+> - **Heading**: R² = 0.73, RMSE = 5.5 d, ±10 d = 94 %
+> - **Flag leaf**: R² = 0.71, RMSE = 5.8 d, ±10 d = 92 %
+> - **Boot**: R² = 0.69, RMSE = 5.4 d, ±10 d = 94 %
+> - **Emergence**: R² = 0.36, RMSE = 29.0 d
+> - **Maturity** (plausibility-filtered, DOS ≥ 280): R² = 0.34, RMSE = 6.2 d
+> - **Tillering**: R² = 0.34, RMSE = 16.5 d · **Jointing**: R² = 0.33, RMSE = 16.2 d
+> - Mean R² across all 8 stages: **0.54**
 
 > **Slim 3-source stack.** Initial design used nine candidate sources. Two rounds of leave-one-year-out ablation
 > ([meteo_ablation.csv](data/results/meteo_ablation.csv), [per_source_ablation_summary.csv](data/results/per_source_ablation_summary.csv))
@@ -87,10 +89,10 @@ WheatPhenologyHRW/
 
 | Decision | Rationale |
 |---|---|
-| **Buffer-300m polygons** as spatial unit | Captures field + edge mixing typical of weekly observation reports; 6,120 polygons |
+| **Buffer-300m polygons** as spatial unit | Captures field + edge mixing typical of weekly observation reports; 5,294 fields / 8,465 field-years |
 | **WES** (Wang–Engel–Streck) phenology core | Wang & Engel (1998) three-phase DVS-rate formulation with Streck (2003) generalised f(V); avoids cultivar-specific parameter tuning, embeds inside a satellite-driven framework |
 | **Spring-only filter** for tillering/jointing targets (DOS > 200) | Pre-dormancy reports were biasing target — WES predicts spring resumption |
-| **Strict maturity labels** (Maturity + Harvest Ready only) | Pooled maturity stages gave R²~0; restriction recovers R²=0.57 (paper finding) |
+| **Plausibility-filtered maturity labels** (DOS ≥ 280) | Drops prior-season harvest-residue observations mis-attributed to the next growing season; recovers maturity R² = 0.34 |
 | **Stage-specific feature subsets** | Grain-filling features causally invalid for emergence/tillering/jointing |
 | **SelectKBest auto-tuned K** per stage | Prevents over-regularization with 150+ features |
 | **5-model comparison** (linear + tree) | Linear models win middle stages, RandomForest wins emergence |

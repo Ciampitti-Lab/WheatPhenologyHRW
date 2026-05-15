@@ -10,7 +10,7 @@ authors:
   - family-names: Ciampitti
     given-names: Ignacio
     affiliation: "Department of Agronomy, Purdue University"
-repository-code: "https://github.com/<your-username>/WheatFlagLeaf"
+repository-code: "https://github.com/<TODO>/WheatPhenologyHRW"
 abstract: >-
   A physics-informed machine learning framework for winter wheat phenology.
   The physical core (WES) adapts Wang & Engel (1998)'s three-phase DVS-rate
@@ -40,6 +40,6 @@ preferred-citation:
       given-names: Vlasis
     - family-names: Ciampitti
       given-names: Ignacio
-  journal: "Remote Sensing of Environment"
+  journal: "International Journal of Applied Earth Observation and Geoinformation"
   year: 2026
   status: in-preparation
