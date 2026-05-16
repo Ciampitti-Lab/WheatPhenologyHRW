@@ -56,7 +56,7 @@ PHENO_PATH = ('/depot/ciampitti/data/WheatPhenologyHRW/data/processed/'
 OUT_DIR = EXT / 'v3_results'
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-SIGMAS = [7, 14, 21]      # days, std of Gaussian perturbation
+SIGMAS = [7, 14, 21, 28]      # days, std of Gaussian perturbation
 N_REPS = 3
 # Best (strategy, model) per reproductive stage, from multi_stage_best_a6_gs
 BEST_MODEL = {'flag_leaf': 'XGBoost', 'boot': 'LightGBM',
