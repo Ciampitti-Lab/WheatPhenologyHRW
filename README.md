@@ -73,7 +73,8 @@ WheatPhenologyHRW/
 │   ├── 05_analysis/
 │   │   ├── 01_sowing_sensitivity.py     · sowing-anchor perturbation (Supp. S4)
 │   │   ├── 02_sowing_dev_recompute.py   · sowing-deviation calibration (Supp. S4)
-│   │   └── 03_reviewer_stats.py         · provenance for in-text numbers
+│   │   ├── 03_reviewer_stats.py         · provenance for in-text numbers
+│   │   └── 04_tillering_target_ab.py    · tillering target-definition robustness (Supp. S7)
 │   ├── deidentify_public_release.py     · regenerates data_public/ from raw
 │   └── utils/                           · config loader, WES thermal model, CV
 └── tests/                            — smoke tests (config + import sanity)
