@@ -1,16 +1,9 @@
-"""Figure A1 — label-intrinsic scatter of vegetative-stage onset.
+"""Figure A1: within-field-year scatter of vegetative-stage onset.
 
-Reproduces the appendix figure quantifying the descriptive-label noise
-floor: for every training (field, harvest-year) carrying >=2 same-stage
-observations within a 21 d span, the within-field-year standard
-deviation of the recorded stage-onset day (DOS) is computed, and its
-distribution is shown for the three vegetative stages.
-
-Runs entirely from the committed, de-identified public subset
-(data_public/processed/phenology_labels.parquet) — no restricted data
-needed. Same methodology as scripts/05_analysis/03_reviewer_stats.py.
-
-    python3 scripts/04_figures/07_fa1_label_noise.py
+For each training (field, harvest-year) with >=2 same-stage
+observations inside a 21 d span, take the SD of the recorded onset DOS,
+and plot its distribution for the three vegetative stages. Runs off the
+public data_public/ subset.
 """
 import sys
 from pathlib import Path

@@ -10,14 +10,12 @@ Outputs:
     docs/figures/feature_importance_per_stage.csv
 """
 
-# --- repo-portable paths (no hardcoded cluster paths) --------------------
-import sys as _sys
-from pathlib import Path as _Path
-_sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from scripts.utils.config import CFG, REPO_ROOT
 _WORK = REPO_ROOT / CFG.paths.work_dir
 _PHENO = str(REPO_ROOT / CFG.paths.phenology_matched)
-# ------------------------------------------------------------------------
 
 from pathlib import Path
 import warnings

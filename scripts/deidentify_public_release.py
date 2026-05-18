@@ -1,23 +1,9 @@
-"""De-identify the per-field artefacts for the public release.
+"""Build the de-identified public data subset.
 
-Mirrors the de-identification logic of the companion WheatGPCPipeline:
-the partner-issued field identifiers are remapped to anonymous integers
-with a deterministic, file-consistent mapping, and exact field
-coordinates are dropped while state-level geographic context is kept.
-
-Produces, under ``data_public/processed/`` (committed to the public
-repo, restricted to the paper's four training seasons 2013/14–2016/17):
-
-  * phenology_labels.parquet  — cleaned per-field stage observations
-  * sowing_lookup.parquet     — per field-year WES sowing anchor
-  * features_v3_train.parquet — DOS-anchored model feature matrix
-  * field_id_mapping.json     — anonymous-id count only (original
-                                identifiers are intentionally omitted)
-
-The original partner-issued keys and the raw lat/lon are NEVER written.
-Read-only on the inputs. Run from the repo root:
-
-    python3 scripts/deidentify_public_release.py
+Remaps field identifiers to anonymous integers (consistent across
+files), drops exact coordinates, keeps state, and restricts to the four
+training seasons. Writes data_public/processed/. The id mapping is not
+saved. Run from the repo root.
 """
 import json
 import sys

@@ -1,28 +1,17 @@
-"""Recompute the sowing-anchor calibration stat for the training cohort.
+"""Deviation of observed sowing dates from the state-median fallback.
 
-The manuscript S4 / Results 3.3 sentence quotes the deviation of observed
-sowing dates from their state-median fallback as MAD 16.5 d, median 12 d,
-SD 28 d, originally over the FULL-period observed set (n=1679). The
-supplement is now scoped to the training cohort only, so this recomputes
-the same statistic over the training-cohort observed set (n=1382).
-
-Method is identical to 37_build_sowing_lookup.py: the state-median is the
-fixed fallback value stored in the lookup (median of ALL observed per
-state, full period); deviation = observed sowing DOY - that state median.
-
-VALIDATION GATE: the script first reproduces the full-period numbers and
-only the run that recovers ~16.5/12/28 certifies the training-cohort
-numbers as methodologically consistent. Read-only; prints a report.
+Reports the mean absolute deviation, median and SD over the training
+cohort. The state-median is the fixed fallback value from the sowing
+lookup. The full-period figures are printed too as a check that the
+method reproduces the published numbers. Read-only.
 """
 
-# --- repo-portable paths (no hardcoded cluster paths) --------------------
-import sys as _sys
-from pathlib import Path as _Path
-_sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from scripts.utils.config import CFG, REPO_ROOT
 _WORK = REPO_ROOT / CFG.paths.work_dir
 _PHENO = str(REPO_ROOT / CFG.paths.phenology_matched)
-# ------------------------------------------------------------------------
 
 from pathlib import Path
 import numpy as np
