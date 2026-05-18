@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="791.28pt" height="237.312pt" viewBox="0 0 791.28 237.312" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-04-30T12:54:58.621894</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 237.312 
+L 791.28 237.312 
+L 791.28 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 58.68 230.112 
+L 216.375652 230.112 
+L 216.375652 30.528 
+L 58.68 30.528 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 64.987826 222.12864 
+L 210.067826 222.12864 
+Q 213.221739 222.12864 213.221739 218.13696 
+L 213.221739 42.50304 
+Q 213.221739 38.51136 210.067826 38.51136 
+L 64.987826 38.51136 
+Q 61.833913 38.51136 61.833913 42.50304 
+L 61.833913 218.13696 
+Q 61.833913 222.12864 64.987826 222.12864 
+z
+" clip-path="url(#p0923aae318)" style="fill: #faf8f2; stroke: #000000; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="matplotlib.axis_1"/>
+   <g id="matplotlib.axis_2"/>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 44px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle; fill: #6b5c36" x="137.527826" y="110.52781" transform="rotate(-0 137.527826 110.52781)">0.83</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle" x="137.527826" y="166.116565" transform="rotate(-0 137.527826 166.116565)">Anthesis R²</text>
+   </g>
+   <g id="text_3">
+    <text style="font-style: italic; font-size: 10px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle" x="137.527826" y="192.954575" transform="rotate(-0 137.527826 192.954575)">(vs 0.70 SOTA)</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_4">
+    <path d="M 247.914783 230.112 
+L 405.610435 230.112 
+L 405.610435 30.528 
+L 247.914783 30.528 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 254.222609 222.12864 
+L 399.302609 222.12864 
+Q 402.456522 222.12864 402.456522 218.13696 
+L 402.456522 42.50304 
+Q 402.456522 38.51136 399.302609 38.51136 
+L 254.222609 38.51136 
+Q 251.068696 38.51136 251.068696 42.50304 
+L 251.068696 218.13696 
+Q 251.068696 222.12864 254.222609 222.12864 
+z
+" clip-path="url(#p071c3957c7)" style="fill: #faf8f2; stroke: #000000; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="matplotlib.axis_3"/>
+   <g id="matplotlib.axis_4"/>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 44px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle; fill: #6b5c36" x="326.762609" y="110.52781" transform="rotate(-0 326.762609 110.52781)">5.1 d</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle" x="326.762609" y="166.116565" transform="rotate(-0 326.762609 166.116565)">Anthesis RMSE</text>
+   </g>
+   <g id="text_6">
+    <text style="font-style: italic; font-size: 10px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle" x="326.762609" y="192.954575" transform="rotate(-0 326.762609 192.954575)">(vs 7.7 d SOTA)</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_6">
+    <path d="M 437.149565 230.112 
+L 594.845217 230.112 
+L 594.845217 30.528 
+L 437.149565 30.528 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 443.457391 222.12864 
+L 588.537391 222.12864 
+Q 591.691304 222.12864 591.691304 218.13696 
+L 591.691304 42.50304 
+Q 591.691304 38.51136 588.537391 38.51136 
+L 443.457391 38.51136 
+Q 440.303478 38.51136 440.303478 42.50304 
+L 440.303478 218.13696 
+Q 440.303478 222.12864 443.457391 222.12864 
+z
+" clip-path="url(#padf596c2f2)" style="fill: #faf8f2; stroke: #000000; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="matplotlib.axis_5"/>
+   <g id="matplotlib.axis_6"/>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 44px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle; fill: #6b5c36" x="515.997391" y="110.52781" transform="rotate(-0 515.997391 110.52781)">94 %</text>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle" x="515.997391" y="166.116565" transform="rotate(-0 515.997391 166.116565)">Predictions within ±10 d</text>
+   </g>
+   <g id="text_9">
+    <text style="font-style: italic; font-size: 10px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle" x="515.997391" y="192.954575" transform="rotate(-0 515.997391 192.954575)">(4 critical stages)</text>
+   </g>
+  </g>
+  <g id="axes_4">
+   <g id="patch_8">
+    <path d="M 626.384348 230.112 
+L 784.08 230.112 
+L 784.08 30.528 
+L 626.384348 30.528 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 632.692174 222.12864 
+L 777.772174 222.12864 
+Q 780.926087 222.12864 780.926087 218.13696 
+L 780.926087 42.50304 
+Q 780.926087 38.51136 777.772174 38.51136 
+L 632.692174 38.51136 
+Q 629.538261 38.51136 629.538261 42.50304 
+L 629.538261 218.13696 
+Q 629.538261 222.12864 632.692174 222.12864 
+z
+" clip-path="url(#p05c3ff5c6b)" style="fill: #faf8f2; stroke: #000000; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="matplotlib.axis_7"/>
+   <g id="matplotlib.axis_8"/>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 44px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle; fill: #6b5c36" x="705.232174" y="110.52781" transform="rotate(-0 705.232174 110.52781)">6 120</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle" x="705.232174" y="166.116565" transform="rotate(-0 705.232174 166.116565)">Wheat fields</text>
+   </g>
+   <g id="text_12">
+    <text style="font-style: italic; font-size: 10px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: middle" x="705.232174" y="192.954575" transform="rotate(-0 705.232174 192.954575)">× 5 growing seasons</text>
+   </g>
+  </g>
+  <g id="text_13">
+   <text style="font-weight: 700; font-size: 18px; font-family: 'Source Serif Pro', 'Charter', 'Georgia', serif; text-anchor: start" x="7.2" y="20.877187" transform="rotate(-0 7.2 20.877187)">Key findings</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p0923aae318">
+   <rect x="58.68" y="30.528" width="157.695652" height="199.584"/>
+  </clipPath>
+  <clipPath id="p071c3957c7">
+   <rect x="247.914783" y="30.528" width="157.695652" height="199.584"/>
+  </clipPath>
+  <clipPath id="padf596c2f2">
+   <rect x="437.149565" y="30.528" width="157.695652" height="199.584"/>
+  </clipPath>
+  <clipPath id="p05c3ff5c6b">
+   <rect x="626.384348" y="30.528" width="157.695652" height="199.584"/>
+  </clipPath>
+ </defs>
+</svg>
