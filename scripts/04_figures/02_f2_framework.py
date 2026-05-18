@@ -9,6 +9,7 @@ the Figure 2 caption in sections/methods.tex.
 Run:  python scripts/05_visualization/make_framework_figure.py
 Writes F2_framework.{pdf,png} into the paper-overleaf figures/ dir.
 """
+import argparse
 from pathlib import Path
 
 import matplotlib
@@ -17,7 +18,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
-OUT = Path(__file__).resolve().parents[2] / "docs" / "figures"
+_DEFAULT_OUT = Path(__file__).resolve().parents[2] / "docs" / "figures"
+_ap = argparse.ArgumentParser(description="Generate the F2 framework schematic.")
+_ap.add_argument("--out", type=Path, default=_DEFAULT_OUT,
+                 help="output directory for F2_framework.{pdf,png} "
+                      "(default: <repo>/docs/figures; pass e.g. a "
+                      "paper-overleaf/figures path to update the manuscript)")
+OUT = _ap.parse_args().out
 
 C_IN = ["#2f6090", "#a9842f", "#2f6090", "#1f7a6b", "#9e3b3b"]
 C_FEAT = "#d9c79f"
