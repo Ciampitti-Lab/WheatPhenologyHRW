@@ -68,9 +68,10 @@ WheatPhenologyHRW/
     ├── 03_modeling/                — multi-stage ML
     │   └── 01_multi_stage_ml.ipynb       · 8 stages × 3 strategies × 5 models
     │
-    ├── 04_benchmarks/              — independent process-based benchmark
+    ├── 04_benchmarks/              — internal sanity-check only (NOT in the manuscript)
     │   ├── 01_pcse_wofost_poc.ipynb      · Single-field PCSE-WOFOST PoC
     │   └── 02_pcse_wofost_batch.py       · Parallel batch (1,830 field-years, ~3 min)
+    │                                       — kept for internal reference; excluded from the paper
     │
     ├── 05_visualization/           — publication-quality figures
     │   ├── 01_paper_figures.ipynb        · F1–F7 + summary table → poster_figures/
@@ -126,7 +127,9 @@ WheatPhenologyHRW/
               ┌───────────┴───────────┐
               ▼                       ▼
         04_benchmarks/        05_visualization/
-        WOFOST as Strategy D   F1–F7 + summary table
+        WOFOST (internal       F1–F7 + summary table
+        sanity-check;
+        not in manuscript)
 ```
 
 ---
@@ -177,7 +180,7 @@ jupyter nbconvert --execute scripts/02_features/01_phenometrics_and_thermal.ipyn
 jupyter nbconvert --execute scripts/03_modeling/01_multi_stage_ml.ipynb
 ```
 
-### 5) Run WOFOST benchmark (optional, ~3 min)
+### 5) Run WOFOST benchmark (optional, internal-only — not reported in the manuscript, ~3 min)
 ```bash
 python scripts/04_benchmarks/02_pcse_wofost_batch.py --workers 4
 ```
@@ -215,7 +218,7 @@ Foundation:
 - **Porter & Gawith (1999)** — Wheat cardinal temperatures
 - **McMaster & Wilhelm (1997)** — GDD method 2
 
-Benchmark:
+Benchmark (internal sanity-check only — not part of the manuscript):
 - **PCSE/WOFOST 7.2** — Wageningen process-based crop model (de Wit et al.)
 
 ---
