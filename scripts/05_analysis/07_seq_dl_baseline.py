@@ -1,21 +1,12 @@
-"""Raw-signal sequence-DL baseline -- NAIVE VI-only ablation.
-[NOTE] VI-only (no auxiliary inputs); kept for context. The FAIR
-comparison reported in Supplementary S9 (learned VI embedding + the
-same WES/Daymet/LST/state features) is 08_seq_dl_hybrid.py.
+"""Raw-signal VI-only sequence model (internal context only).
 
-Why hand-craft phenometrics when a temporal network could learn them
-end-to-end from the raw HLS series (TempCNN, Pelletier et al. 2019;
-Russwurm & Korner 2020)? We test it across all eight stages (symmetry with the deep-tabular evaluation).
-
-Input: per (field, harvest-year) daily-interpolated + Savitzky-Golay
-NDVI/EVI/GCVI over DOS 1..365 (the exact series the phenometrics are
-built from). Models: TempCNN (3 conv blocks) and a 2-layer LSTM.
-Identical leave-one-year-out protocol, input+target standardised on the
-training fold, inner-year early stopping, 5-seed averaged, bootstrap
-CIs. Both underperform the engineered + physiology model by a wide
-margin at every stage (0/16 cells; gap widest at reproductive, best ~0.33 vs
-0.69-0.82; unstable on the smaller cohorts). Needs a
-GPU. Output: <work_dir>/v3_results/seq_dl_baseline.csv
+A Temporal Convolutional Network and a two-layer LSTM trained on the
+daily NDVI/EVI/GCVI series alone, without the Wang-Engel-Streck, Daymet,
+MODIS-LST or state features. Retained as an internal context script; the
+comparison reported in the paper (Supplementary S9) is the matched-input
+evaluation in 08_seq_dl_hybrid.py, where the learned representation is
+combined with the same auxiliary features the engineered models use.
+Needs a GPU. Output: <work_dir>/v3_results/seq_dl_baseline.csv
 """
 import sys, time, warnings
 from pathlib import Path

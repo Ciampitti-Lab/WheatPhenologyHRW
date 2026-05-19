@@ -130,7 +130,7 @@ def main():
         d,tgt=stage_frame(fe,s)
         feat=cols(s,True)                       # full Hybrid feature set
         aux=[c for c in feat if not is_phenometric(c)]   # keep WES+meteo+LST+thermal+state
-        for mn,Mk in [('TempCNN+aux',HybCNN),('LSTM+aux',HybLSTM)]:
+        for mn,Mk in [('TempCNN',HybCNN),('LSTM',HybLSTM)]:
             t1=time.time()
             Tr,P=loyo(d,seqs,aux,tgt,Mk)
             if len(Tr)<5:
