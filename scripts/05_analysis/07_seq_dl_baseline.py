@@ -1,4 +1,7 @@
-"""Raw-signal sequence-DL baseline (Supplementary S9; reviewer de-risking).
+"""Raw-signal sequence-DL baseline -- NAIVE VI-only ablation.
+[NOTE] VI-only (no auxiliary inputs); kept for context. The FAIR
+comparison reported in Supplementary S9 (learned VI embedding + the
+same WES/Daymet/LST/state features) is 08_seq_dl_hybrid.py.
 
 Why hand-craft phenometrics when a temporal network could learn them
 end-to-end from the raw HLS series (TempCNN, Pelletier et al. 2019;
