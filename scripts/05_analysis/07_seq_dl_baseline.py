@@ -2,7 +2,7 @@
 
 Why hand-craft phenometrics when a temporal network could learn them
 end-to-end from the raw HLS series (TempCNN, Pelletier et al. 2019;
-Russwurm & Korner 2020)? We test it at the four reproductive stages.
+Russwurm & Korner 2020)? We test it across all eight stages (symmetry with the deep-tabular evaluation).
 
 Input: per (field, harvest-year) daily-interpolated + Savitzky-Golay
 NDVI/EVI/GCVI over DOS 1..365 (the exact series the phenometrics are
@@ -10,7 +10,8 @@ built from). Models: TempCNN (3 conv blocks) and a 2-layer LSTM.
 Identical leave-one-year-out protocol, input+target standardised on the
 training fold, inner-year early stopping, 5-seed averaged, bootstrap
 CIs. Both underperform the engineered + physiology model by a wide
-margin at every reproductive stage (best ~0.33 vs 0.69-0.82). Needs a
+margin at every stage (0/16 cells; gap widest at reproductive, best ~0.33 vs
+0.69-0.82; unstable on the smaller cohorts). Needs a
 GPU. Output: <work_dir>/v3_results/seq_dl_baseline.csv
 """
 import sys, time, warnings
@@ -28,8 +29,10 @@ PHENO = str(REPO_ROOT / CFG.paths.phenology_matched)
 HLS = WORK / 'hls_full_2013_2024.parquet'
 OUT = WORK / 'v3_results'; OUT.mkdir(parents=True, exist_ok=True)
 VIS = ['NDVI', 'EVI', 'GCVI']; T = 365
-REPRO = ['flag_leaf', 'boot', 'heading', 'anthesis']
-ENG = {'flag_leaf': 0.71, 'boot': 0.69, 'heading': 0.73, 'anthesis': 0.82}
+REPRO = ['emergence', 'tillering', 'jointing', 'flag_leaf',
+         'boot', 'heading', 'anthesis', 'maturity']
+ENG = {'emergence': 0.36, 'tillering': 0.34, 'jointing': 0.33, 'flag_leaf': 0.71,
+       'boot': 0.69, 'heading': 0.73, 'anthesis': 0.82, 'maturity': 0.44}
 dev = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
