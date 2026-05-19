@@ -1,4 +1,8 @@
 """F5 — Per-stage feature importance.
+[NOTE] Reflects the original 5-model best map. For the current 7-model
+pipeline (FT-Transformer adopted at anthesis/maturity) the canonical,
+FT-capable generator is scripts/04_figures/09_paper_figures.py.
+
 
 For each of the 8 stages, refit the best model (per V3 Phase E) on the full
 training set, extract feature importance (|coef| for linear models after

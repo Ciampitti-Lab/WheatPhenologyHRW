@@ -1,4 +1,8 @@
 """F3 — Per-stage predicted vs observed scatter (8 panels).
+[NOTE] Reflects the original 5-model best map. For the current 7-model
+pipeline (FT-Transformer adopted at anthesis/maturity) the canonical,
+FT-capable generator is scripts/04_figures/09_paper_figures.py.
+
 The money figure for the paper.
 
 Uses V2 vanilla features (growing-season DOS), runs LOYO with the

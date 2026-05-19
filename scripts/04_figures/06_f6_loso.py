@@ -1,4 +1,8 @@
 """F6 — Leave-One-State-Out (LOSO) transferability heatmap.
+[NOTE] Reflects the original 5-model best map. For the current 7-model
+pipeline (FT-Transformer adopted at anthesis/maturity) the canonical,
+FT-capable generator is scripts/04_figures/09_paper_figures.py.
+
 
 For each (stage, state-held-out), train on the other 4 states and test
 on the held-out state. Reveals spatial generalization of the framework.

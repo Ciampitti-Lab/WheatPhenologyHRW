@@ -102,7 +102,7 @@ ml:
   cv_inner_folds:   5
   bootstrap_iters:  2000
   k_grid:           [20, 40, 60, 80, null]   # null = use all features
-  models:           [ElasticNet, Ridge, RandomForest, XGBoost, LightGBM]
+  models:           [ElasticNet, Ridge, RandomForest, XGBoost, LightGBM, TabNet, FT-Transformer]
   strategies:
     ml_only: Machine-learning only (no WES outputs among the features)
     hybrid:  Physiology-informed — WES thermal-time outputs + ML

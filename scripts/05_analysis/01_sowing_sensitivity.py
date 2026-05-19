@@ -1,4 +1,8 @@
 """Sowing-date fallback sensitivity analysis (reviewer de-risking, SI).
+[NOTE] anthesis here uses the old ElasticNet best; the manuscript value
+is recomputed with the adopted FT-Transformer in
+scripts/05_analysis/06_anthesis_ft_ablation.py. flag_leaf/boot/heading
+(tree/linear best, unchanged) keep the numbers reported here.
 
 Question a JAG reviewer will ask: 85.3% of training field-years use the
 state-median sowing-date fallback to anchor the Wang--Engel--Streck (WES)

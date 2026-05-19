@@ -4,7 +4,7 @@ message: "If you use this software in academic work, please cite both the softwa
 type: software
 authors:
   - family-names: Mangidis
-    given-names: Vlasis
+    given-names: Vlasios
     affiliation: "Department of Agronomy, Purdue University"
     email: vlmangidis@gmail.com
   - family-names: Ciampitti
@@ -15,8 +15,9 @@ abstract: >-
   A physics-informed machine learning framework for winter wheat phenology.
   The physical core (WES) adapts Wang & Engel (1998)'s three-phase DVS-rate
   model with Streck et al. (2003)'s generalised vernalization function f(V).
-  WES outputs are coupled with HLS satellite phenometrics in a five-model ML
-  ensemble (ElasticNet, Ridge, Random Forest, XGBoost, LightGBM). Predicts
+  WES outputs are coupled with HLS satellite phenometrics in a seven-model
+  ensemble (ElasticNet, Ridge, Random Forest, XGBoost, LightGBM, TabNet,
+  FT-Transformer). Predicts
   eight winter wheat phenological stages (emergence to maturity) at 30 m
   field scale across the US Plains using HLS Landsat-Sentinel and Daymet
   daily weather.
@@ -31,13 +32,13 @@ keywords:
   - HLS
 license: MIT
 version: "1.0.0"
-date-released: "2026-05-18"
+date-released: "2026-05-19"
 preferred-citation:
   type: article
-  title: "WES: A Wang-Engel-Streck phenology framework for multi-stage winter wheat phenology prediction from satellite remote sensing"
+  title: "A multi-stage hybrid framework for field-scale winter-wheat phenology across the U.S. Hard Red Winter belt"
   authors:
     - family-names: Mangidis
-      given-names: Vlasis
+      given-names: Vlasios
     - family-names: Ciampitti
       given-names: Ignacio
   journal: "International Journal of Applied Earth Observation and Geoinformation"

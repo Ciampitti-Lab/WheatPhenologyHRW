@@ -12,7 +12,7 @@ vernalization term replaced by Streck et al. (2003)'s generalised
 sigmoidal *f(V)*, anchored to **per-field observed sowing dates** rather
 than a regional crop calendar. WES outputs are coupled with Harmonized
 Landsat–Sentinel (HLS) phenometrics, Daymet meteorology and MODIS LST
-inside a five-model ML ensemble, applied per stage to the **eight
+inside a seven-model ML ensemble, applied per stage to the **eight
 phenological stages** (emergence → maturity) of the **U.S. Hard Red
 Winter belt**, over the four training seasons **2013/14–2016/17**.
 
@@ -24,18 +24,23 @@ Winter belt**, over the four training seasons **2013/14–2016/17**.
 
 > **Headline** (LOYO CV; 5,293 fields; 8,465 field-years; four seasons
 > 2013/14–2016/17; Hard Red Winter wheat):
-> - **Anthesis**: R² = 0.80, RMSE = 4.8 d
+> - **Anthesis** (FT-Transformer): R² = 0.82, RMSE = 4.6 d
 > - **Heading**: R² = 0.73, RMSE = 5.5 d
 > - **Flag leaf**: R² = 0.71, RMSE = 5.8 d
 > - **Boot**: R² = 0.69, RMSE = 5.4 d
 > - **Emergence**: R² = 0.36, RMSE = 29.0 d
 > - **Tillering**: R² = 0.34, RMSE = 16.5 d · **Jointing**: R² = 0.33, RMSE = 16.2 d
-> - **Maturity** (plausibility-filtered, DOS ≥ 280): R² = 0.34, RMSE = 6.2 d, n = 357
+> - **Maturity** (FT-Transformer; plausibility-filtered, DOS ≥ 280): R² = 0.44, RMSE = 5.7 d, n = 357
 >
 > The physiology-informed strategy (WES + ML) gives the higher LOYO R²
-> in seven of the eight stages, concentrated at the reproductive
-> transitions. Spatial transferability is assessed by leave-one-state-out
-> (LOSO) cross-validation.
+> in five of the eight stages (best model per strategy); a controlled,
+> model-agnostic with/without-WES ablation confirms the physiological
+> gain is robust at the reproductive transitions. Two deep tabular
+> models (TabNet, FT-Transformer) are evaluated under the identical
+> protocol; the FT-Transformer is the selected model at anthesis and
+> maturity. Spatial transferability is assessed by leave-one-state-out
+> (LOSO) CV, with a controlled LOSO ablation reported as a negative
+> control (WES does not aid cross-region transfer).
 
 ## Repository structure
 
@@ -59,7 +64,7 @@ WheatPhenologyHRW/
 │   │   ├── 01_build_training_cohort.py  · enumerate the training field-years
 │   │   └── 02_build_features.py         · DOS-anchored feature matrix (canonical)
 │   ├── 03_modeling/
-│   │   ├── 01_phase_e_loyo.py           · 8 stages × 2 strategies × 5 models, LOYO
+│   │   ├── 01_phase_e_loyo.py           · 8 stages × 2 strategies × 7 models, LOYO
 │   │   └── 02_fix_maturity.py           · DOS ≥ 280 maturity-label correction
 │   ├── 04_figures/
 │   │   ├── 01_f1_study_area.py          · F1 study-area map
@@ -67,14 +72,17 @@ WheatPhenologyHRW/
 │   │   ├── 03_f3_scatter.py             · F3 per-stage predicted vs observed
 │   │   ├── 04_f4_strategy.py            · F4 strategy comparison
 │   │   ├── 05_f5_feature_importance.py  · F5 per-stage feature importance
-│   │   ├── 06_f6_loso.py                · F6 LOSO transferability
+│   │   ├── 06_f6_loso.py                · F6 LOSO transferability (5-model; superseded)
 │   │   ├── 07_fa1_label_noise.py        · FA1 label-noise floor (runs on data_public/)
-│   │   └── 08_paper_figures.py          · consolidated figure driver
+│   │   ├── 08_paper_figures.py          · consolidated figure driver (legacy)
+│   │   └── 09_paper_figures.py          · canonical 7-model F3–F6 (FT-capable)
 │   ├── 05_analysis/
 │   │   ├── 01_sowing_sensitivity.py     · sowing-anchor perturbation (Supp. S4)
 │   │   ├── 02_sowing_dev_recompute.py   · sowing-deviation calibration (Supp. S4)
 │   │   ├── 03_reviewer_stats.py         · provenance for in-text numbers
-│   │   └── 04_tillering_target_ab.py    · tillering target-definition robustness (Supp. S7)
+│   │   ├── 04_tillering_target_ab.py    · tillering target-definition robustness (Supp. S7)
+│   │   ├── 05_loso_wes_ablation.py      · WES cross-region negative control (Supp. S8)
+│   │   └── 06_anthesis_ft_ablation.py   · anthesis sowing-sensitivity, adopted FT
 │   ├── deidentify_public_release.py     · regenerates data_public/ from raw
 │   └── utils/                           · config loader, WES thermal model, CV
 └── tests/                            — smoke tests (config + import sanity)
@@ -108,6 +116,11 @@ python scripts/04_figures/07_fa1_label_noise.py    # FA1 label-noise floor
 # gitignored config.local.yaml that overrides config.yaml):
 python scripts/01_sowing/01_build_sowing_lookup.py
 python scripts/02_features/01_build_training_cohort.py
+python scripts/02_features/02_build_features.py
+python scripts/03_modeling/01_phase_e_loyo.py     # 7-model Phase-E + LOSO (GPU)
+python scripts/04_figures/09_paper_figures.py     # F3–F6 (GPU for deep stages)
+python scripts/05_analysis/05_loso_wes_ablation.py    # Supp. S8 negative control
+python scripts/05_analysis/06_anthesis_ft_ablation.py # adopted-FT anthesis ablation
 python scripts/02_features/02_build_features.py
 python scripts/03_modeling/01_phase_e_loyo.py
 python scripts/03_modeling/02_fix_maturity.py

@@ -13,6 +13,11 @@ scikit-learn==1.8.0
 xgboost==3.2.0
 lightgbm==4.6.0
 
+# Deep tabular models (FT-Transformer, TabNet — 7-model Phase-E)
+torch>=2.2
+rtdl-revisiting-models>=0.0.2
+pytorch-tabnet>=4.1
+
 # Process-based crop model (Strategy D benchmark)
 
 # Geospatial
