@@ -82,7 +82,8 @@ WheatPhenologyHRW/
 │   │   ├── 03_reviewer_stats.py         · provenance for in-text numbers
 │   │   ├── 04_tillering_target_ab.py    · tillering target-definition robustness (Supp. S7)
 │   │   ├── 05_loso_wes_ablation.py      · WES cross-region negative control (Supp. S8)
-│   │   └── 06_anthesis_ft_ablation.py   · anthesis sowing-sensitivity, adopted FT
+│   │   ├── 06_anthesis_ft_ablation.py   · anthesis sowing-sensitivity, adopted FT
+│   │   └── 07_seq_dl_baseline.py         · raw-signal TempCNN/LSTM baseline (Supp. S9)
 │   ├── deidentify_public_release.py     · regenerates data_public/ from raw
 │   └── utils/                           · config loader, WES thermal model, CV
 └── tests/                            — smoke tests (config + import sanity)
@@ -121,6 +122,7 @@ python scripts/03_modeling/01_phase_e_loyo.py     # 7-model Phase-E + LOSO (GPU)
 python scripts/04_figures/09_paper_figures.py     # F3–F6 (GPU for deep stages)
 python scripts/05_analysis/05_loso_wes_ablation.py    # Supp. S8 negative control
 python scripts/05_analysis/06_anthesis_ft_ablation.py # adopted-FT anthesis ablation
+python scripts/05_analysis/07_seq_dl_baseline.py      # Supp. S9 raw-signal TempCNN/LSTM
 python scripts/02_features/02_build_features.py
 python scripts/03_modeling/01_phase_e_loyo.py
 python scripts/03_modeling/02_fix_maturity.py
