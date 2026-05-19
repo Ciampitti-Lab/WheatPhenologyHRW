@@ -402,6 +402,7 @@ bullets("Reading the LOSO result", [
     "Kansas-dominated model transfers with bounded skill to adjacent southern belt",
     "Colorado weakest: high-plains elevation, later cold-tolerant cultivars, dispersed sowing",
     "Scope delineation, not a defect — field-scale resolves heterogeneity a regional mean masks",
+    "Negative control (S8): controlled LOSO with/without-WES → WES does NOT aid cross-region transfer (neutral at well-sampled states); it is an in-distribution thermal-time prior, not a spatial-generalisation device — reported honestly",
 ], kicker="Interpretation")
 
 # ───────────────────────── DISCUSSION ─────────────────────────
