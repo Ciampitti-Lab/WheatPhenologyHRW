@@ -124,11 +124,7 @@ python scripts/04_figures/09_paper_figures.py     # F3–F6 (GPU for deep stages
 python scripts/05_analysis/05_loso_wes_ablation.py    # Supp. S8 negative control
 python scripts/05_analysis/06_anthesis_ft_ablation.py # adopted-FT anthesis ablation
 python scripts/05_analysis/07_seq_dl_baseline.py      # VI-only ablation (context)
-python scripts/05_analysis/08_seq_dl_hybrid.py        # Supp. S9 FAIR learned-VI + aux
-python scripts/02_features/02_build_features.py
-python scripts/03_modeling/01_phase_e_loyo.py
-python scripts/03_modeling/02_fix_maturity.py
-python scripts/04_figures/08_paper_figures.py
+python scripts/05_analysis/08_seq_dl_hybrid.py        # Supp. S9 learned-VI representation
 ```
 
 `config.yaml` ships with **relative** paths under `data/`. Point the
