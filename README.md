@@ -142,11 +142,11 @@ overlay (see `scripts/utils/config.py`); your local paths stay private.
 
 ## Citations
 
-- **Wang & Engel (1998)** — three-phase DVS-rate phenology model
-- **Streck et al. (2003)** — generalised vernalization function *f(V)*
-- **Porter & Gawith (1999)** — wheat cardinal temperatures
-- **McMaster & Wilhelm (1997)** — growing-degree-day method
-- **Bandaru et al. (2020)** — PhenoCrop photo-thermal framework
+- **Wang & Engel (1998)**: three-phase DVS-rate phenology model
+- **Streck et al. (2003)**: generalised vernalization function *f(V)*
+- **Porter & Gawith (1999)**: wheat cardinal temperatures
+- **McMaster & Wilhelm (1997)**: growing-degree-day method
+- **Bandaru et al. (2020)**: PhenoCrop photo-thermal framework
 
 ## Contact
 
