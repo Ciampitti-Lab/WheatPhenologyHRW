@@ -1,4 +1,4 @@
-# WheatPhenologyHRW — Multi-Stage Phenology Prediction for HRW Wheat
+# WheatPhenologyHRW: Multi-Stage Phenology Prediction for HRW Wheat
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
