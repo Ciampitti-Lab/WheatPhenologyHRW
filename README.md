@@ -47,15 +47,15 @@ Winter belt**, over the four training seasons **2013/14–2016/17**.
 ```
 WheatPhenologyHRW/
 ├── README.md · LICENSE · CITATION.cff · requirements.txt
-├── config.yaml                       — single source of truth (relative paths)
-├── data_public/processed/            — DE-IDENTIFIED public data subset
+├── config.yaml                       · single source of truth (relative paths)
+├── data_public/processed/            · DE-IDENTIFIED public data subset
 │   ├── phenology_labels.parquet         · cleaned per-field stage observations
 │   ├── sowing_lookup.parquet            · per field-year WES sowing anchor
 │   ├── features_v3_train.parquet        · DOS-anchored model feature matrix
 │   └── field_id_mapping.json            · anonymous-id count (originals omitted)
-├── docs/figures/                     — manuscript figures (F1–F6, FA1, F2)
+├── docs/figures/                     · manuscript figures (F1-F6, FA1, F2)
 ├── scripts/
-│   ├── 00_extraction/                — Google Earth Engine extraction (.js)
+│   ├── 00_extraction/                · Google Earth Engine extraction (.js)
 │   │   ├── 01_hls.js                    · HLS L8+S2 surface reflectance
 │   │   └── 02_modis_lst.js              · MOD11A2 land-surface temperature
 │   ├── 01_sowing/
@@ -85,9 +85,24 @@ WheatPhenologyHRW/
 │   │   ├── 06_anthesis_ft_ablation.py   · anthesis sowing-sensitivity, adopted FT
 │   │   ├── 07_seq_dl_baseline.py         · raw-signal TempCNN/LSTM, VI-only ablation
 │   │   └── 08_seq_dl_hybrid.py            · FAIR learned-VI + matched aux (Supp. S9)
+│   ├── 06_revision/                     · JAG round-1 revision analyses
+│   │   ├── R00_verify_baseline.py       · audit of the submission vs the pipeline
+│   │   ├── R01_component_ablation.py    · per-source ablation (Table 4)
+│   │   ├── R02_label_uncertainty.py     · visit-interval label bound (Table 7)
+│   │   ├── R03_selection_integrity.py   · nested CV, pre-specified model (Table 6)
+│   │   ├── R04_sequence_and_shift.py    · stage ordering; state shift (Table 8)
+│   │   ├── R05_fold_derived_sowing.py   · fold-wise sowing anchor (Supp. S15)
+│   │   ├── R06_public_reproducibility.py· coordinate precision (Supp. S14)
+│   │   ├── R07_feature_table.py         · input inventory (Supp. S17)
+│   │   ├── R08_grouped_permutation.py   · uniform importance measure (F5)
+│   │   ├── R09_figure1_studyarea.py     · F1 study-area map
+│   │   ├── R10_figure5_importance.py    · F5 from R08
+│   │   ├── R11_temporal_stress.py       · label coverage, L2YO (Supp. S16)
+│   │   ├── R12_verify_manuscript.py     · checks every number against its source
+│   │   └── submit.sh                    · SLURM wrapper
 │   ├── deidentify_public_release.py     · regenerates data_public/ from raw
 │   └── utils/                           · config loader, WES thermal model, CV
-└── tests/                            — smoke tests (config + import sanity)
+└── tests/                            · smoke tests (config + import sanity)
 ```
 
 ## Data availability
@@ -96,9 +111,16 @@ Raw field phenology observations and field-polygon geometries are
 subject to data-sharing agreements and are **not** redistributed. A
 **de-identified subset** sufficient to reproduce the modelling and the
 label-noise figure is committed under `data_public/processed/`: field
-identifiers are remapped to anonymous integers (originals and exact
-coordinates omitted), restricted to the four training seasons. Regenerate
-it from the restricted source with:
+identifiers are remapped to anonymous integers, and field coordinates are
+snapped to the centre of a 0.05-degree grid cell, restricted to the four
+training seasons.
+
+Coordinates are coarsened rather than dropped because latitude and
+longitude are model inputs: removing them moves LOYO R² by up to 0.10, so
+the release would not reproduce the published results. At 0.05 degrees no
+field centroid is recoverable and every published value reproduces to
+within 0.005 R² (`scripts/06_revision/R06_public_reproducibility.py`).
+Regenerate the subset from the restricted source with:
 
 ```bash
 python scripts/deidentify_public_release.py
@@ -125,7 +147,27 @@ python scripts/05_analysis/05_loso_wes_ablation.py    # Supp. S8 negative contro
 python scripts/05_analysis/06_anthesis_ft_ablation.py # adopted-FT anthesis ablation
 python scripts/05_analysis/07_seq_dl_baseline.py      # VI-only ablation (context)
 python scripts/05_analysis/08_seq_dl_hybrid.py        # Supp. S9 learned-VI representation
+
+# JAG round-1 revision analyses (scripts/06_revision/, see below)
+cd scripts/06_revision
+./submit.sh R01_component_ablation.py       # per-source ablation
+./submit.sh R03_selection_integrity.py      # nested CV + pre-specified model
+python R02_label_uncertainty.py             # label bound (no cluster needed)
+python R12_verify_manuscript.py             # 84 checks against main.tex
 ```
+
+### Revision analyses
+
+`scripts/06_revision/` holds the analyses added for the first revision of
+the manuscript. Each script names the reviewer comment it answers in its
+docstring, and each reuses the published pipeline core in
+`scripts/utils/deep_models.py`, so every number it produces is directly
+comparable with the submitted version. Results are written to
+`data/revision/`.
+
+`R12_verify_manuscript.py` is the one to run before any resubmission: it
+parses the headline numbers out of the manuscript source and compares each
+against the result file that produced it.
 
 `config.yaml` ships with **relative** paths under `data/`. Point the
 pipeline at your own storage by creating a gitignored `config.local.yaml`
