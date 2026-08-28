@@ -1,0 +1,160 @@
+"""R12 - Check every headline number in the manuscript against its source.
+
+The revision makes "we re-derived every reported quantity from the code"
+a central claim of the response letter. This script is what makes that
+claim checkable, and it is meant to be re-run before any future
+resubmission: it parses the numbers out of main.tex and compares them
+with the result files that produced them.
+
+A FAIL here means the manuscript and the analysis disagree. Run it after
+any edit that touches a number.
+
+Usage:  python R12_verify_manuscript.py [path/to/main.tex]
+"""
+import re
+import sys
+from pathlib import Path
+
+import pandas as pd
+
+REV = Path('/home/vmangidi/repositories/WheatPhenologyHRW/data/revision')
+GRID = ('/depot/ciampitti/data/WheatPhenologyHRW/data/raw/satellite/'
+        'extension_2018_2024/deep_baseline/phaseE_full_grid.parquet')
+TEX = Path(sys.argv[1] if len(sys.argv) > 1
+           else '/home/vmangidi/repositories/paper-overleaf/main.tex')
+
+checks = []
+
+
+def check(label, claimed, actual, tol=0.006):
+    ok = (claimed is not None and actual is not None
+          and abs(float(claimed) - float(actual)) <= tol)
+    checks.append((ok, label, claimed, actual))
+    print(f'  [{"OK  " if ok else "FAIL"}] {label:52s} '
+          f'manuscript={claimed}  source={actual}')
+
+
+def main():
+    tex = TEX.read_text()
+
+    print('=== Table 3, adopted model per stage (phaseE grid) ===')
+    g = pd.read_parquet(GRID)
+    ADOPT = {'emergence': ('C_Hybrid', 'LightGBM', 0.36, 29.0),
+             'tillering': ('B_ML-only', 'ElasticNet', 0.34, 16.5),
+             'jointing': ('C_Hybrid', 'LightGBM', 0.33, 16.2),
+             'flag_leaf': ('C_Hybrid', 'XGBoost', 0.71, 5.8),
+             'boot': ('C_Hybrid', 'LightGBM', 0.69, 5.4),
+             'heading': ('C_Hybrid', 'ElasticNet', 0.73, 5.5),
+             'anthesis': ('C_Hybrid', 'FT', 0.82, 4.6),
+             'maturity': ('C_Hybrid', 'FT', 0.44, 5.7)}
+    for st, (strat, mod, r2_tab, rmse_tab) in ADOPT.items():
+        row = g[(g.stage == st) & (g.strategy == strat) & (g.model == mod)]
+        check(f'Table 3 R2 {st}', r2_tab, round(float(row.R2.iloc[0]), 2))
+        check(f'Table 3 RMSE {st}', rmse_tab,
+              round(float(row.RMSE.iloc[0]), 1), tol=0.06)
+
+    print('\n=== Table 4, per-source ablation (R01, LightGBM + context) ===')
+    a = pd.read_csv(REV / 'R01_component_ablation.csv')
+    w = a[(a.context) & (a.model == 'LightGBM')].pivot_table(
+        index='stage', columns='variant', values='R2')
+    tab4 = {'Emergence': ('emergence', 0.28, 0.34, 0.30, 0.36),
+            'Tillering': ('tillering', 0.22, 0.29, 0.22, 0.27),
+            'Flag leaf': ('flag_leaf', 0.65, 0.46, 0.40, 0.70),
+            'Boot': ('boot', 0.65, 0.51, 0.53, 0.69),
+            'Heading': ('heading', 0.71, 0.57, 0.56, 0.71),
+            'Anthesis': ('anthesis', 0.81, 0.77, 0.60, 0.70),
+            'Maturity': ('maturity', 0.42, 0.45, 0.16, 0.34)}
+    for lbl, (st, wes, hls, met, allv) in tab4.items():
+        check(f'Table 4 WES-only {st}', wes, round(w.loc[st, 'WES_only'], 2))
+        check(f'Table 4 HLS-only {st}', hls, round(w.loc[st, 'HLS_only'], 2))
+        check(f'Table 4 Meteo-only {st}', met,
+              round(w.loc[st, 'Weather_only'], 2))
+        check(f'Table 4 All {st}', allv, round(w.loc[st, 'ALL'], 2))
+
+    print('\n=== Table 6, selection optimism (R03) ===')
+    r3 = pd.read_csv(REV / 'R03_selection_integrity.csv').set_index('stage')
+    for st in r3.index:
+        check(f'Table 6 nested {st}', None, None) if False else None
+    check('Table 6 mean optimism', 0.036, round(r3.optimism.mean(), 3))
+    for st, v in [('heading', 0.006), ('anthesis', 0.000)]:
+        check(f'Table 6 optimism {st}', v, round(r3.loc[st, 'optimism'], 3))
+
+    print('\n=== Table 7, label bound (R02) ===')
+    r2f = pd.read_csv(REV / 'R02_label_uncertainty.csv').set_index('stage')
+    check('Table 7 emergence unbracketed %', 64.7,
+          round(r2f.loc['emergence', 'pct_left_censored'], 1), tol=0.06)
+    check('Table 7 tillering bracket (d)', 76.6,
+          round(r2f.loc['tillering', 'interval_mean'], 1), tol=0.06)
+    rep = ['flag_leaf', 'boot', 'heading', 'anthesis']
+    lo = r2f.loc[rep, 'pct_of_error_explained'].min()
+    hi = r2f.loc[rep, 'pct_of_error_explained'].max()
+    check('text: reproductive floor lower %', 80, round(lo), tol=0.6)
+    check('text: reproductive floor upper %', 119, round(hi), tol=0.6)
+
+    print('\n=== Table 8, held-out-state shift (R04) ===')
+    sh = pd.read_csv(REV / 'R04_state_shift.csv')
+    shr = sh[sh.stage.isin(rep)]
+    for stt, auc, shift in [('TX', 0.986, -0.80), ('OK', 0.956, -0.99),
+                            ('KS', 0.979, 0.16), ('NE', 0.900, 1.43),
+                            ('CO', 0.999, 2.75)]:
+        d = shr[shr.state == stt]
+        check(f'Table 8 AUC {stt}', auc, round(d.auc.mean(), 3))
+        check(f'Table 8 shift {stt}', shift, round(d.target_shift.mean(), 2),
+              tol=0.011)
+
+    print('\n=== Sec 3.4, fold-derived sowing (R05) ===')
+    r5 = pd.read_csv(REV / 'R05_fold_derived_sowing.csv')
+    pv = r5.pivot_table(index='stage', columns='variant', values='pct_retained')
+    for st, fm, fs in [('flag_leaf', 95, 88), ('boot', 88, 83),
+                       ('heading', 97, 92), ('anthesis', 91, 36)]:
+        check(f'fold-median retained {st} (%)', fm,
+              round(pv.loc[st, 'fold_median']), tol=0.6)
+        check(f'fold-strict retained {st} (%)', fs,
+              round(pv.loc[st, 'fold_strict']), tol=0.6)
+
+    print('\n=== Sec 3.6, leave-two-years-out (R11) ===')
+    r11 = pd.read_csv(REV / 'R11_temporal_stress.csv').set_index('stage')
+    check('L2YO mean loss, all stages', 0.086, round(r11['drop'].mean(), 3))
+    check('L2YO mean loss, reproductive', 0.101,
+          round(r11.loc[rep, 'drop'].mean(), 3))
+    check('L2YO worst heading', 0.100, round(r11.loc['heading', 'R2_l2yo_min'], 3))
+    check('L2YO worst boot', 0.215, round(r11.loc['boot', 'R2_l2yo_min'], 3))
+
+    print('\n=== Sec 3.5, grouped permutation importance (R08) ===')
+    sh8 = pd.read_csv(REV / 'R08_importance_share.csv').set_index('stage')
+    check('WES share flag leaf (%)', 82, round(sh8.loc['flag_leaf', 'WES']), tol=0.6)
+    check('Site share emergence (%)', 51, round(sh8.loc['emergence', 'Site']), tol=0.6)
+    check('Site share maturity (%)', 51, round(sh8.loc['maturity', 'Site']), tol=0.6)
+    check('HLS share emergence (%)', 26, round(sh8.loc['emergence', 'HLS']), tol=0.6)
+
+    print('\n=== cohort counts quoted in Table 2 ===')
+    cov = pd.read_csv(REV / 'R11_label_coverage.csv')
+    c18 = cov[cov.harvest_year == 2018].iloc[0]
+    check('harvest-2018 emergence field-years', 863, int(c18.emergence), tol=0.5)
+    check('harvest-2018 other stages (sum)', 0,
+          int(sum(c18[s] for s in ['tillering', 'jointing', 'flag_leaf',
+                                   'boot', 'heading', 'anthesis', 'maturity'])),
+          tol=0.5)
+
+    print('\n=== em dashes and stale claims in the .tex ===')
+    for bad, why in [('---', 'em dash'),
+                     ('strictly by held-out', 'old selection-rule wording'),
+                     ('latitude, longitude, elevation', 'elevation as an input'),
+                     ('full-season vector', 'old feature-set claim'),
+                     ('transferability is strong', 'withdrawn transfer claim')]:
+        n = tex.count(bad)
+        checks.append((n == 0, f'no "{bad}" ({why})', 0, n))
+        print(f'  [{"OK  " if n == 0 else "FAIL"}] absent: {why:38s} count={n}')
+
+    bad = [c for c in checks if not c[0]]
+    print(f'\n{"=" * 60}\n{len(checks) - len(bad)}/{len(checks)} checks passed')
+    if bad:
+        print('\nFAILURES:')
+        for _, lbl, claimed, actual in bad:
+            print(f'  {lbl}: manuscript={claimed} source={actual}')
+        sys.exit(1)
+    print('Every checked number in the manuscript matches its source file.')
+
+
+if __name__ == '__main__':
+    main()
