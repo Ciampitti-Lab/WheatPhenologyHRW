@@ -65,6 +65,13 @@ LST_PATH    = EXT / 'modis_lst_2012_2024.parquet'
 
 # ─── DOS-aware smoothing + phenometrics ──────────────────────────────────────
 
+
+# NumPy compatibility: np.trapz was removed in NumPy 2.x in favour of
+# np.trapezoid. The two are the same function under different names, so this
+# alias keeps the published pipeline runnable on both without changing any
+# result. Without it the feature build raises AttributeError on NumPy >= 2.
+_trapz = getattr(np, 'trapz', None) or np.trapezoid
+
 def smooth_vi_dos(dos_arr, vals_arr, window=15, polyorder=2):
     """Interpolate VI to daily DOS grid (1-365) and Savitzky-Golay smooth."""
     if len(dos_arr) < 5:
@@ -132,7 +139,7 @@ def extract_phenometrics_gs(dos_arr, smoothed, vi_name):
         feat[f'{vi_name}_greenup_midpoint'] = midpoint
         feat[f'{vi_name}_duration_greenup'] = pos_dos - sos
         sos_i = max(0, int(sos) - 1)
-        feat[f'{vi_name}_integrated'] = float(np.trapz(smoothed[sos_i:pos_dos]))
+        feat[f'{vi_name}_integrated'] = float(_trapz(smoothed[sos_i:pos_dos]))
     else:
         feat[f'{vi_name}_greenup_midpoint'] = np.nan
         feat[f'{vi_name}_duration_greenup'] = np.nan

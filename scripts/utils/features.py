@@ -13,6 +13,13 @@ from scipy.optimize import curve_fit
 
 # ─── smoothing ───────────────────────────────────────────────────────────────
 
+
+# NumPy compatibility: np.trapz was removed in NumPy 2.x in favour of
+# np.trapezoid. The two are the same function under different names, so this
+# alias keeps the published pipeline runnable on both without changing any
+# result. Without it the feature build raises AttributeError on NumPy >= 2.
+_trapz = getattr(np, 'trapz', None) or np.trapezoid
+
 def smooth_vi(doys, values, window=15, polyorder=2):
     """Interpolate VI to daily DOY grid (1-365) and Savitzky-Golay smooth.
 
@@ -81,7 +88,7 @@ def extract_phenometrics(doys, smoothed, vi_name):
     if not np.isnan(sos):
         sos_int = max(0, int(sos) - 1)
         pos_int = min(364, pos_doy - 1)
-        feat[f'{vi_name}_integrated'] = float(np.trapz(smoothed[sos_int:pos_int + 1]))
+        feat[f'{vi_name}_integrated'] = float(_trapz(smoothed[sos_int:pos_int + 1]))
     else:
         feat[f'{vi_name}_integrated'] = np.nan
 
