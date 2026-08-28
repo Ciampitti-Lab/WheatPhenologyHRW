@@ -1,0 +1,42 @@
+Traceback (most recent call last):
+  File "/home/vmangidi/repositories/WheatPhenologyHRW/scripts/06_revision/R05_fold_derived_sowing.py", line 182, in <module>
+    main()
+  File "/home/vmangidi/repositories/WheatPhenologyHRW/scripts/06_revision/R05_fold_derived_sowing.py", line 94, in main
+    wx = pd.read_parquet(DAYMET, columns=['field_id', 'date', 'doy', 'tmax', 'tmin'])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/depot/ciampitti/apps/envs/wheatphen_deep/lib/python3.11/site-packages/pandas/io/parquet.py", line 671, in read_parquet
+    return impl.read(
+           ^^^^^^^^^^
+  File "/depot/ciampitti/apps/envs/wheatphen_deep/lib/python3.11/site-packages/pandas/io/parquet.py", line 260, in read
+    pa_table = self.api.parquet.read_table(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/depot/ciampitti/apps/envs/wheatphen_deep/lib/python3.11/site-packages/pyarrow/parquet/core.py", line 1959, in read_table
+    return dataset.read(columns=columns, use_threads=use_threads,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/depot/ciampitti/apps/envs/wheatphen_deep/lib/python3.11/site-packages/pyarrow/parquet/core.py", line 1585, in read
+    table = self._dataset.to_table(
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "pyarrow/_dataset.pyx", line 579, in pyarrow._dataset.Dataset.to_table
+  File "pyarrow/_dataset.pyx", line 415, in pyarrow._dataset.Dataset.scanner
+  File "pyarrow/_dataset.pyx", line 3704, in pyarrow._dataset.Scanner.from_dataset
+  File "pyarrow/_dataset.pyx", line 3617, in pyarrow._dataset.Scanner._make_scan_options
+  File "pyarrow/_dataset.pyx", line 3567, in pyarrow._dataset._populate_builder
+  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
+pyarrow.lib.ArrowInvalid: No match for FieldRef.Name(field_id) in FIELDID: string
+date: timestamp[ns]
+Tmin: float
+Tmax: float
+prcp: float
+srad: float
+vp: float
+swe: float
+vpd: float
+ptq: float
+month: int8
+harvest_year: int16
+dos: int16
+__fragment_index: int32
+__batch_index: int32
+__last_in_fragment: bool
+__filename: string
+srun: error: a133: task 0: Exited with exit code 1

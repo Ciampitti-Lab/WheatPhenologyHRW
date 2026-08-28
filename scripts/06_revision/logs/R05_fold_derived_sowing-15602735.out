@@ -1,0 +1,53 @@
+  -> data/revision/R05_fold_medians.csv  (24 rows)
+=== fold-derived vs global state-median sowing DOY ===
+ held_out_year state  median_global  median_trainfold  n_train_obs  shift_days
+          2014    CO          280.0             280.0           35         0.0
+          2014    KS          278.0             279.0          613         1.0
+          2014    NE          263.0             263.0            7         0.0
+          2014    NM          295.0               NaN            0         NaN
+          2014    OK          290.0             287.0          250        -3.0
+          2014    TX          286.0             286.0          122         0.0
+          2015    CO          280.0             285.0           26         5.0
+          2015    KS          278.0             278.0          629         0.0
+          2015    NE          263.0             263.0            5         0.0
+          2015    NM          295.0             295.0            1         0.0
+          2015    OK          290.0             286.0          238        -4.0
+          2015    TX          286.0             281.0          124        -5.0
+          2016    CO          280.0             280.0           30         0.0
+          2016    KS          278.0             278.0          661         0.0
+          2016    NE          263.0             263.0            5         0.0
+          2016    NM          295.0             295.0            1         0.0
+          2016    OK          290.0             293.0          224         3.0
+          2016    TX          286.0             286.0          148         0.0
+          2017    CO          280.0             279.5           14        -0.5
+          2017    KS          278.0             274.0          647        -4.0
+          2017    NE          263.0             270.5            4         7.5
+          2017    NM          295.0             295.0            1         0.0
+          2017    OK          290.0             291.0          254         1.0
+          2017    TX          286.0             285.0          107        -1.0
+
+  |shift|: mean=1.52 d  max=7.5 d
+
+loading Daymet ...
+  weather for 6120 fields
+  Flag leaf  control      hybrid=0.711 gain=+0.274 (resim 0, 2.2s)
+  Flag leaf  fold_median  hybrid=-0.154 gain=-0.591 (resim 1995, 22.3s)
+  Flag leaf  fold_strict  hybrid=-0.503 gain=-0.940 (resim 2657, 28.9s)
+  Boot       control      hybrid=0.689 gain=+0.120 (resim 0, 0.9s)
+  Boot       fold_median  hybrid=-0.495 gain=-1.064 (resim 1771, 18.8s)
+  Boot       fold_strict  hybrid=-0.903 gain=-1.472 (resim 2320, 24.2s)
+  Heading    control      hybrid=0.732 gain=+0.336 (resim 0, 2.2s)
+  Heading    fold_median  hybrid=-32.225 gain=-32.621 (resim 2067, 23.2s)
+  Heading    fold_strict  hybrid=-42.915 gain=-43.311 (resim 2714, 29.7s)
+  Anthesis   control      hybrid=0.803 gain=+0.102 (resim 0, 2.2s)
+  Anthesis   fold_median  hybrid=-25.592 gain=-26.293 (resim 1087, 13.2s)
+  Anthesis   fold_strict  hybrid=-35.036 gain=-35.738 (resim 1464, 16.9s)
+  -> data/revision/R05_fold_derived_sowing.csv  (12 rows)
+
+=== gain retained under a fold-derived anchor ===
+variant    control  fold_median  fold_strict
+stage                                       
+anthesis     100.0     -25851.7     -35137.9
+boot         100.0       -885.5      -1224.9
+flag_leaf    100.0       -215.4       -342.7
+heading      100.0      -9710.8     -12893.1

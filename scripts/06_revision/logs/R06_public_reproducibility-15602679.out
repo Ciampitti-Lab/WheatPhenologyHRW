@@ -1,0 +1,78 @@
+=== cell occupancy of the coordinate grids ===
+  0.05 deg : 1765 cells, median 2 fields/cell, 39.2 % singleton cells
+  0.10 deg :  886 cells, median 3 fields/cell, 27.0 % singleton cells
+  0.25 deg :  318 cells, median 6 fields/cell, 17.3 % singleton cells
+  (5293 unique fields in total)
+
+  Emergence  full        LightGBM    R2=+0.358
+  Emergence  dropped     LightGBM    R2=+0.265
+  Emergence  coarse_0.05 LightGBM    R2=+0.357
+  Emergence  coarse_0.1  LightGBM    R2=+0.357
+  Emergence  coarse_0.25 LightGBM    R2=+0.344
+  Tillering  full        ElasticNet  R2=+0.336
+  Tillering  dropped     ElasticNet  R2=+0.346
+  Tillering  coarse_0.05 ElasticNet  R2=+0.336
+  Tillering  coarse_0.1  ElasticNet  R2=+0.336
+  Tillering  coarse_0.25 ElasticNet  R2=+0.328
+  Jointing   full        LightGBM    R2=+0.334
+  Jointing   dropped     LightGBM    R2=+0.326
+  Jointing   coarse_0.05 LightGBM    R2=+0.338
+  Jointing   coarse_0.1  LightGBM    R2=+0.337
+  Jointing   coarse_0.25 LightGBM    R2=+0.344
+  Flag leaf  full        XGBoost     R2=+0.711
+  Flag leaf  dropped     XGBoost     R2=+0.702
+  Flag leaf  coarse_0.05 XGBoost     R2=+0.710
+  Flag leaf  coarse_0.1  XGBoost     R2=+0.704
+  Flag leaf  coarse_0.25 XGBoost     R2=+0.709
+  Boot       full        LightGBM    R2=+0.689
+  Boot       dropped     LightGBM    R2=+0.668
+  Boot       coarse_0.05 LightGBM    R2=+0.694
+  Boot       coarse_0.1  LightGBM    R2=+0.681
+  Boot       coarse_0.25 LightGBM    R2=+0.683
+  Heading    full        ElasticNet  R2=+0.732
+  Heading    dropped     ElasticNet  R2=+0.630
+  Heading    coarse_0.05 ElasticNet  R2=+0.732
+  Heading    coarse_0.1  ElasticNet  R2=+0.732
+  Heading    coarse_0.25 ElasticNet  R2=+0.732
+  Anthesis   full        LightGBM    R2=+0.700
+  Anthesis   dropped     LightGBM    R2=+0.644
+  Anthesis   coarse_0.05 LightGBM    R2=+0.700
+  Anthesis   coarse_0.1  LightGBM    R2=+0.721
+  Anthesis   coarse_0.25 LightGBM    R2=+0.690
+  Maturity   full        LightGBM    R2=+0.336
+  Maturity   dropped     LightGBM    R2=+0.249
+  Maturity   coarse_0.05 LightGBM    R2=+0.326
+  Maturity   coarse_0.1  LightGBM    R2=+0.326
+  Maturity   coarse_0.25 LightGBM    R2=+0.305
+  -> data/revision/R06_public_reproducibility.csv  (40 rows)
+
+=== LOYO R2 by coordinate treatment ===
+variant    coarse_0.05  coarse_0.1  coarse_0.25  dropped   full
+stage                                                          
+emergence        0.357       0.357        0.344    0.265  0.358
+tillering        0.336       0.336        0.328    0.346  0.336
+jointing         0.338       0.337        0.344    0.326  0.334
+flag_leaf        0.710       0.704        0.709    0.702  0.711
+boot             0.694       0.681        0.683    0.668  0.689
+heading          0.732       0.732        0.732    0.630  0.732
+anthesis         0.700       0.721        0.690    0.644  0.700
+maturity         0.326       0.326        0.305    0.249  0.336
+
+=== deviation from the native-precision run ===
+variant    coarse_0.05  coarse_0.1  coarse_0.25  dropped
+stage                                                   
+emergence       -0.001      -0.001       -0.014   -0.093
+tillering        0.000       0.000       -0.009    0.010
+jointing         0.004       0.003        0.011   -0.008
+flag_leaf       -0.001      -0.007       -0.002   -0.009
+boot             0.005      -0.008       -0.006   -0.021
+heading          0.000       0.000       -0.000   -0.102
+anthesis         0.000       0.021       -0.010   -0.055
+maturity        -0.010      -0.010       -0.031   -0.087
+
+max |deviation| per variant:
+variant
+coarse_0.05    0.010
+coarse_0.1     0.021
+coarse_0.25    0.031
+dropped        0.102

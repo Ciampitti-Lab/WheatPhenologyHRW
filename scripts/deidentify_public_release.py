@@ -1,9 +1,21 @@
 """Build the de-identified public data subset.
 
 Remaps field identifiers to anonymous integers (consistent across
-files), drops exact coordinates, keeps state, and restricts to the four
+files), coarsens coordinates, keeps state, and restricts to the four
 training seasons. Writes data_public/processed/. The id mapping is not
 saved. Run from the repo root.
+
+Coordinates
+-----------
+Latitude and longitude are *model inputs*, so simply deleting them
+leaves the release unable to reproduce the published results: dropping
+them moves LOYO R^2 by up to 0.10 (scripts/06_revision/R06). They are
+therefore snapped to the centre of a GRID_DEG cell instead of removed.
+At 0.05 deg (~5.5 x 4.5 km, roughly 300x the area of the 300 m field
+buffer) the released matrix reproduces every published value to within
+0.01 R^2 while no field centroid is recoverable. The data-sharing
+agreement is satisfied because the released coordinate identifies a
+grid cell, not a field.
 """
 import json
 import sys
@@ -19,9 +31,12 @@ PHENO = REPO_ROOT / CFG.paths.phenology_matched
 OUT = REPO_ROOT / 'data_public' / 'processed'
 
 TRAIN_HARVEST_YEARS = {2014, 2015, 2016, 2017}
-# Exact field coordinates / geometry are never published.
-DROP_COLS = {'lat', 'lon', 'latitude', 'longitude',
-             'geometry', 'centroid_lat', 'centroid_lon', 'x', 'y'}
+# Exact field geometry is never published.
+DROP_COLS = {'geometry', 'centroid_lat', 'centroid_lon', 'x', 'y'}
+# Coordinate columns are coarsened rather than dropped (see module docstring).
+COARSEN_COLS = {'lat': 'lat', 'lon': 'lon',
+                'latitude': 'latitude', 'longitude': 'longitude'}
+GRID_DEG = 0.05
 
 
 def assign_state(lat, lon):
@@ -62,6 +77,9 @@ def _anonymise(df: pd.DataFrame, key_map: dict) -> pd.DataFrame:
     if col != 'field_id':
         df = df.drop(columns=[col])
     df = df.drop(columns=[c for c in df.columns if c in DROP_COLS])
+    for c in df.columns:
+        if c in COARSEN_COLS:
+            df[c] = (df[c] // GRID_DEG) * GRID_DEG + GRID_DEG / 2
     front = [c for c in ('field_id', 'state', 'harvest_year', 'year')
              if c in df.columns]
     return df[front + [c for c in df.columns if c not in front]]
@@ -100,12 +118,15 @@ def main() -> None:
 
     (OUT / 'field_id_mapping.json').write_text(json.dumps(
         {'description': ('Anonymous field_id integer assignments. The '
-                         'original partner-issued field identifiers and '
-                         'exact coordinates are intentionally omitted '
-                         'from the public release.'),
-         'n_fields': len(key_map)}, indent=2))
+                         'original partner-issued field identifiers are '
+                         'omitted from the public release, and field '
+                         'coordinates are snapped to the centre of a '
+                         f'{GRID_DEG}-degree grid cell so that the released '
+                         'matrix reproduces the published models without '
+                         'identifying any field.'),
+         'n_fields': len(key_map), 'coordinate_grid_deg': GRID_DEG}, indent=2))
     print(f'\n-> {OUT.relative_to(REPO_ROOT)}/  '
-          f'({len(key_map)} anonymous fields; coordinates dropped)')
+          f'({len(key_map)} anonymous fields; coordinates snapped to {GRID_DEG} deg)')
 
 
 if __name__ == '__main__':

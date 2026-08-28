@@ -45,7 +45,7 @@ feats = [
     "Wang-Engel-Streck\nthermal-time simulator",
     "Per-stage target dates\n(8 stages, DOS)",
 ]
-centre = ("Five ML regressors\n$\\times$ two strategies\nper stage\n\n"
+centre = ("Seven ML regressors\n$\\times$ two strategies\nper stage\n\n"
           "LOYO and LOSO\ncross-validation")
 outputs = ["Per-stage timing\n(8 stages, field scale)",
            "Retrospective phenology\natlas (HRW belt)"]

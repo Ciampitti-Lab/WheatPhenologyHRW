@@ -38,7 +38,13 @@ STAGE_MAP = {
 SPRING={'tillering','jointing'}; EARLY={'emergence','tillering','jointing'}
 META_FIXED=['field_id','year','flag_true_doy','n_obs','sowing_doy_used']
 REDUND=['GDD_M2_at_SOS','VD_at_SOS','emergence_doy','VD_from_emergence_at_SOS',
-        'fV_from_emergence_at_SOS','days_emergence_to_SOS']
+        'fV_from_emergence_at_SOS','days_emergence_to_SOS',
+        # ph_top is an all-NaN SoilGrids placeholder (02_build_features.py):
+        # median imputation turns it into a zero-variance constant, so it
+        # carries no information. The figure scripts (04_figures/*) always
+        # dropped it; dropping it here too makes the modelling and figure
+        # feature sets identical without changing any reported number.
+        'ph_top']
 WE=['WE_emergence_doy','WE_tillering_doy','WE_jointing_doy','WE_flag_leaf_doy',
     'WE_boot_doy','WE_heading_doy','WE_anthesis_doy','WE_maturity_doy']
 STATE_OH=['state_TX','state_OK','state_KS','state_NE','state_CO','state_NM']

@@ -1,4 +1,5 @@
 {
-  "description": "Anonymous field_id integer assignments. The original partner-issued field identifiers and exact coordinates are intentionally omitted from the public release.",
-  "n_fields": 5294
+  "description": "Anonymous field_id integer assignments. The original partner-issued field identifiers are omitted from the public release, and field coordinates are snapped to the centre of a 0.05-degree grid cell so that the released matrix reproduces the published models without identifying any field.",
+  "n_fields": 5294,
+  "coordinate_grid_deg": 0.05
 }
