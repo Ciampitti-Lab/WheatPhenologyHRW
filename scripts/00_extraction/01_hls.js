@@ -37,13 +37,26 @@ function renameS2(image) {
 }
 
 // Scale
+//
+// REPRODUCIBILITY NOTE. When this extraction was run, the Earth Engine HLS
+// collections served integer digital numbers, so the 1e-4 factor below was
+// required. They now serve reflectance already scaled to 0-1, and applying
+// the factor a second time drives EVI to ~1e-5 while leaving NDVI and GCVI
+// untouched, because those are ratios and the error cancels. Re-running this
+// script unmodified against the current collection therefore reproduces two
+// of the three indices and silently corrupts the third.
+//
+// The guard below scales only values that are actually digital numbers, so
+// the script behaves correctly under either convention. It does not change
+// the published outputs, which were produced when the collection served DNs.
 function scaleHLS(image) {
-  var scaled = image.select(['Blue','Green','Red','NIR','SWIR1','SWIR2'])
-    .multiply(0.0001);
+  var raw = image.select(['Blue','Green','Red','NIR','SWIR1','SWIR2']);
+  var scaled = raw.where(raw.gt(2.0), raw.multiply(0.0001));
   var bandNames = image.bandNames();
   var hasRE = bandNames.contains('RE1');
+  var re = image.select(['RE1','RE2','RE3']);
   scaled = ee.Algorithms.If(hasRE,
-    scaled.addBands(image.select(['RE1','RE2','RE3']).multiply(0.0001)),
+    scaled.addBands(re.where(re.gt(2.0), re.multiply(0.0001))),
     scaled
   );
   return ee.Image(scaled).copyProperties(image, image.propertyNames());

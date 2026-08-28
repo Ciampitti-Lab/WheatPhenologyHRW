@@ -136,12 +136,23 @@ def main():
                                    'boot', 'heading', 'anthesis', 'maturity'])),
           tol=0.5)
 
+    print('\n=== CDL buffer purity, training seasons (R13c) ===')
+    cf = pd.read_csv(REV / 'R13_cdl_fraction.csv')
+    inw = cf[cf.wheat_fraction > 0.10]
+    med = inw.groupby('radius')['wheat_fraction'].median()
+    for r, claimed in [(150, 77), (300, 56), (500, 42)]:
+        check(f'wheat fraction at r={r} m (%)', claimed,
+              round(100 * med.loc[r]), tol=0.6)
+    check('wheat pixels at r=300 m', 176,
+          round(med.loc[300] * 3.14159 * 300 ** 2 / 900), tol=1.5)
+
     print('\n=== em dashes and stale claims in the .tex ===')
     for bad, why in [('---', 'em dash'),
                      ('strictly by held-out', 'old selection-rule wording'),
                      ('latitude, longitude, elevation', 'elevation as an input'),
                      ('full-season vector', 'old feature-set claim'),
-                     ('transferability is strong', 'withdrawn transfer claim')]:
+                     ('transferability is strong', 'withdrawn transfer claim'),
+                     ('only CDL-wheat pixels enter', 'unapplied CDL mask claim')]:
         n = tex.count(bad)
         checks.append((n == 0, f'no "{bad}" ({why})', 0, n))
         print(f'  [{"OK  " if n == 0 else "FAIL"}] absent: {why:38s} count={n}')
