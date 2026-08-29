@@ -146,6 +146,19 @@ def main():
     check('wheat pixels at r=300 m', 176,
           round(med.loc[300] * 3.14159 * 300 ** 2 / 900), tol=1.5)
 
+    print('\n=== Table 9, buffer sensitivity (R13d) ===')
+    bs = pd.read_csv(REV / 'R13_buffer_sensitivity.csv')
+    pv = bs.pivot_table(index='stage', columns=['mask', 'radius'], values='R2')
+    for st, mk, rd, claimed in [('flag_leaf', 'raw', 300, 0.696),
+                                ('flag_leaf', 'cdl', 150, 0.755),
+                                ('boot', 'raw', 300, 0.707),
+                                ('heading', 'raw', 300, 0.751),
+                                ('anthesis', 'raw', 300, 0.882),
+                                ('flag_leaf', 'raw', 500, 0.660)]:
+        check(f'Table 9 {st} {mk} r={rd}', claimed, round(pv.loc[st, (mk, rd)], 3))
+    check('largest |deviation| from the control', 0.059,
+          round(bs.delta_vs_300raw.abs().max(), 3))
+
     print('\n=== em dashes and stale claims in the .tex ===')
     for bad, why in [('---', 'em dash'),
                      ('strictly by held-out', 'old selection-rule wording'),
