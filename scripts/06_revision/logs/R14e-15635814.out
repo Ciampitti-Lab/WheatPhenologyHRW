@@ -1,0 +1,46 @@
+  -> data/revision/R14_table3.csv  (8 rows)
+=== Table 3 (corrected states) ===
+    stage              strategy      model    R2  R2_lo  R2_hi   RMSE    n
+emergence   Physiology-informed   LightGBM 0.338  0.287  0.385 29.391 4144
+tillering Machine-learning-only      Ridge 0.338  0.316  0.359 16.515 4713
+ jointing   Physiology-informed   LightGBM 0.329  0.303  0.353 16.288 5124
+flag_leaf   Physiology-informed    XGBoost 0.706  0.687  0.723  5.872 2657
+     boot   Physiology-informed   LightGBM 0.670  0.644  0.695  5.598 2319
+  heading   Physiology-informed ElasticNet 0.732  0.715  0.748  5.497 2714
+ anthesis   Physiology-informed         FT 0.819  0.802  0.836  4.566 1464
+ maturity   Physiology-informed         FT 0.451  0.341  0.534  5.631  357
+  -> data/revision/R14_strategy_tally.csv  (8 rows)
+
+=== Figure 4: best per strategy ===
+strategy   B_ML-only  C_Hybrid  delta   winner
+stage                                         
+emergence      0.352     0.338 -0.014  ML-only
+tillering      0.338     0.357  0.019   Hybrid
+jointing       0.276     0.330  0.054   Hybrid
+flag_leaf      0.595     0.713  0.118   Hybrid
+boot           0.638     0.690  0.051   Hybrid
+heading        0.698     0.732  0.033   Hybrid
+anthesis       0.794     0.819  0.026   Hybrid
+maturity       0.466     0.451 -0.016  ML-only
+tally: {'Hybrid': np.int64(6), 'ML-only': np.int64(2)}
+  LOSO Emergence  done
+  LOSO Tillering  done
+  LOSO Jointing   done
+  LOSO Flag leaf  done
+  LOSO Boot       done
+  LOSO Heading    done
+  LOSO Anthesis   done
+  LOSO Maturity   done
+  -> data/revision/R14_loso_final.csv  (40 rows)
+
+=== LOSO, adopted model, corrected states ===
+state         TX     OK     KS     NE     CO
+stage                                       
+emergence  0.288 -0.543  0.157 -6.186 -0.738
+tillering -0.010 -0.094  0.044 -0.136 -0.323
+jointing   0.333  0.155  0.121 -0.199 -0.513
+flag_leaf  0.444  0.315  0.482 -0.182 -0.249
+boot       0.333  0.272  0.317  0.204 -1.096
+heading    0.407  0.524  0.591  0.153 -0.308
+anthesis   0.277  0.412  0.574  0.178 -1.504
+maturity  -0.310  0.118  0.254    NaN    NaN

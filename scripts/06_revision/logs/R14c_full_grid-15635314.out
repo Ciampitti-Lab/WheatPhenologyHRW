@@ -1,0 +1,53 @@
+cohort: 5290 fields, 8461 field-years
+state
+KS    3778
+OK     630
+TX     458
+CO     361
+NE      54
+NM       9 
+
+  Emergence  best B_ML-only/LightGBM     R2=+0.352 RMSE=29.08
+  Tillering  best B_ML-only/Ridge        R2=+0.338 RMSE=16.52
+  Jointing   best C_Hybrid /LightGBM     R2=+0.329 RMSE=16.29
+  Flag leaf  best C_Hybrid /XGBoost      R2=+0.706 RMSE= 5.87
+  Boot       best C_Hybrid /XGBoost      R2=+0.672 RMSE= 5.58
+  Heading    best C_Hybrid /ElasticNet   R2=+0.732 RMSE= 5.50
+  Anthesis   best C_Hybrid /ElasticNet   R2=+0.801 RMSE= 4.79
+  Maturity   best C_Hybrid /LightGBM     R2=+0.341 RMSE= 6.17
+  -> data/revision/R14_grid_cpu.csv  (80 rows)
+
+=== best CPU cell per stage (corrected states) ===
+            strategy       model     R2    RMSE     n
+stage                                                
+emergence  B_ML-only    LightGBM  0.352  29.084  4144
+tillering  B_ML-only       Ridge  0.338  16.515  4713
+jointing    C_Hybrid    LightGBM  0.329  16.288  5124
+flag_leaf   C_Hybrid     XGBoost  0.706   5.872  2657
+boot        C_Hybrid     XGBoost  0.672   5.583  2319
+heading     C_Hybrid  ElasticNet  0.732   5.497  2714
+anthesis    C_Hybrid  ElasticNet  0.801   4.787  1464
+maturity    C_Hybrid    LightGBM  0.341   6.167   357
+
+=== LOSO for the best CPU cell ===
+  Emergence  done
+  Tillering  done
+  Jointing   done
+  Flag leaf  done
+  Boot       done
+  Heading    done
+  Anthesis   done
+  Maturity   done
+  -> data/revision/R14_loso_cpu.csv  (40 rows)
+
+=== LOSO R2 (corrected states) ===
+state         TX     OK     KS     NE     CO
+stage                                       
+emergence  0.281 -0.474  0.151 -3.981 -0.780
+tillering -0.010 -0.094  0.044 -0.136 -0.323
+jointing   0.333  0.155  0.121 -0.199 -0.513
+flag_leaf  0.444  0.315  0.482 -0.182 -0.249
+boot       0.382  0.245  0.297  0.128 -0.855
+heading    0.407  0.524  0.591  0.153 -0.308
+anthesis   0.080  0.283  0.694  0.664 -0.643
+maturity  -0.455  0.011  0.013    NaN    NaN

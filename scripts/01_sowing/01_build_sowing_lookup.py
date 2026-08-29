@@ -42,8 +42,43 @@ STAGE_OFFSET = {
 }
 
 
+# Corrected per-field state assignment (spatial join; see R14a_fix_states.py).
+def _load_state_lookup():
+    import csv, os
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     '..', '..', 'data', 'revision', 'R14_state_lookup.csv')
+    d = {}
+    if os.path.exists(p):
+        with open(p) as f:
+            for r in csv.DictReader(f):
+                if r.get('state_true'):
+                    d[(round(float(r['latitude']), 6),
+                       round(float(r['longitude']), 6))] = r['state_true']
+    return d
+
+
+_STATE_LOOKUP = _load_state_lookup()
+
+
 def assign_state(lat, lon):
-    if pd.isna(lat) or pd.isna(lon):  return None
+    """State of a field centroid.
+
+    NOTE. Earlier versions of this function used a latitude/longitude box:
+
+        if lat < 34.5: 'TX'  elif lat < 37.0: 'OK'  elif lat < 40.0: 'KS'
+
+    That rule assigns the whole Texas Panhandle, which reaches 36.5 N, to
+    Oklahoma, and the -103.5 longitude cut misplaces fields along the
+    Colorado/Kansas border, which lies at -102.05. It misassigned 348 of
+    5293 fields (6.6 %). State is now read from the spatial join produced
+    by scripts/06_revision/R14a_fix_states.py; the box is retained only as
+    a fallback for points the join cannot resolve.
+    """
+    if pd.isna(lat) or pd.isna(lon):
+        return None
+    s = _STATE_LOOKUP.get((round(float(lat), 6), round(float(lon), 6)))
+    if s is not None:
+        return s
     if lon < -103.5 and lat < 37.0:   return 'NM'
     if lon < -103.5:                  return 'CO'
     if lat < 34.5:                    return 'TX'

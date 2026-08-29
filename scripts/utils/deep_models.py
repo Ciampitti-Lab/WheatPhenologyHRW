@@ -52,10 +52,23 @@ LOSO_STATES=['TX','OK','KS','NE','CO']
 K_GRID=(20,40,60,80,None); LIN={'ElasticNet','Ridge'}; DEEP={'TabNet','FT'}
 MODELS=['ElasticNet','Ridge','RandomForest','XGBoost','LightGBM','TabNet','FT']
 ORDER=['emergence','tillering','jointing','flag_leaf','boot','heading','anthesis','maturity']
-# Best (strategy, model) per stage carried to the manuscript Table; FT
-# adopted only where it genuinely wins (anthesis, maturity); flag_leaf /
-# heading kept tree/linear (FT only ties them at two decimals).
-ADOPT={'emergence':('C_Hybrid','LightGBM'),'tillering':('B_ML-only','ElasticNet'),
+# Adopted (strategy, model) per stage, carried to the manuscript table.
+#
+# Selection is argmax LOYO R^2 under two declared rules: a deep tabular
+# network that leads a tree or linear model by less than 0.005 R^2 does not
+# displace it, and TabNet is not adopted at all, because it is the estimator
+# whose failures elsewhere in the grid the Discussion warns against. Its
+# scores remain in the grid and in the strategy comparison of Figure 4,
+# which asks whether the physiology-informed feature set helps and therefore
+# gives each arm its best model.
+#
+# After the state correction (R14a) these choices were re-measured rather
+# than re-optimised. Seven moved by at most 0.021 and are kept; re-running
+# the argmax over the corrected grid would add fresh selection optimism to
+# the +0.036 already reported in Section 3.6. Only tillering changed: its
+# ElasticNet fell from 0.336 to 0.198 because that fit had been balanced on
+# the misassigned encoders, and Ridge on the same feature set gives 0.338.
+ADOPT={'emergence':('C_Hybrid','LightGBM'),'tillering':('B_ML-only','Ridge'),
  'jointing':('C_Hybrid','LightGBM'),'flag_leaf':('C_Hybrid','XGBoost'),
  'boot':('C_Hybrid','LightGBM'),'heading':('C_Hybrid','ElasticNet'),
  'anthesis':('C_Hybrid','FT'),'maturity':('C_Hybrid','FT')}
@@ -194,6 +207,47 @@ def loyo(d,feat,tg,mn,split='year',holdout=None):
         P.extend(pr); T.extend(te[tg].values)
     return np.array(T),np.array(P)
 
+def _apply_corrected_states(fe):
+    """Overwrite the state one-hot encoders with a spatial-join assignment.
+
+    The pipeline originally derived state from a latitude/longitude box that
+    handed the Texas Panhandle (which reaches 36.5 N) to Oklahoma and cut the
+    Colorado/Kansas border at -103.5 rather than -102.05. It misassigned 348
+    of 5293 fields. scripts/06_revision/R14a_fix_states.py rebuilds the
+    assignment by intersecting field centroids with state polygons; this
+    applies the result wherever the cohort is loaded, so every downstream
+    analysis and every leave-one-state-out fold uses it.
+
+    Fields outside the five study states keep their own encoder column where
+    one exists and are never used as a held-out fold. If the lookup is
+    missing the original encoders are left untouched, so the function is safe
+    on a fresh checkout.
+    """
+    import os
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     '..', '..', 'data', 'revision', 'R14_state_lookup.csv')
+    if not os.path.exists(p):
+        return fe
+    look = pd.read_csv(p)
+    look['field_id'] = look['field_id'].astype(str)
+    m = look.set_index('field_id')['state_true'].to_dict()
+    st = fe['field_id'].astype(str).map(m)
+    if st.isna().all():
+        return fe
+    fe = fe.copy()
+    keep = st.notna()
+    for c in STATE_OH:
+        fe.loc[keep, c] = 0.0
+    for name in st.dropna().unique():
+        col = f'state_{name}'
+        if col in fe.columns:
+            fe.loc[keep & (st == name), col] = 1.0
+    # states with no encoder column (WY, IN) are outside the study area
+    fe['_state_true'] = st.where(st.isin([c.replace('state_', '')
+                                          for c in STATE_OH]))
+    return fe
+
+
 def load_cohort(work_dir, pheno_path):
     """Build the feature+target+state frame and a per-(stage,strategy)
     feature-column selector. work_dir / pheno_path come from config."""
@@ -213,7 +267,18 @@ def load_cohort(work_dir, pheno_path):
     fe['field_id']=fe['field_id'].astype(str); fe['year']=fe['year'].astype(int)
     if 'state' in fe.columns: fe=fe.drop(columns=['state'])
     fe=fe.merge(tg,on=['field_id','year'],how='left')
-    fe['state']=fe[STATE_OH].idxmax(axis=1).str.replace('state_','')
+    fe=_apply_corrected_states(fe)
+    if '_state_true' in fe.columns:
+        # Three field centroids fall outside the study area entirely: one in
+        # Indiana, 1400 km east of the belt and plainly a bad coordinate, and
+        # two in Wyoming just north of the Colorado line. They carry no
+        # encoder column, so an argmax over the one-hots would silently file
+        # them under Texas. They are dropped instead.
+        fe=fe[fe['_state_true'].notna()].copy()
+        fe['state']=fe['_state_true']
+        fe=fe.drop(columns=['_state_true'])
+    else:
+        fe['state']=fe[STATE_OH].idxmax(axis=1).str.replace('state_','')
     tc=[s+'_dos_obs' for s in STAGE_MAP]; M=META_FIXED+tc+['state']
     ndre=[c for c in fe.columns if c.startswith('NDRE')]
     allc=[c for c in fe.columns if c not in M and c not in ndre and c not in REDUND

@@ -78,13 +78,20 @@ def north_arrow(ax, loc=(0.94, 0.12)):
 
 
 def main():
+    # State comes from the spatial join of R14a, not the latitude box the
+    # pipeline originally used, which handed the Texas Panhandle to Oklahoma.
+    look = pd.read_csv(Path('/home/vmangidi/repositories/WheatPhenologyHRW/'
+                            'data/revision/R14_state_lookup.csv'))
+    look['field_id'] = look['field_id'].astype(str)
     ft = pd.read_parquet(WORK / 'features_v3_realsowing_train.parquet',
-                         columns=['field_id', 'latitude', 'longitude',
-                                  'state_TX', 'state_OK', 'state_KS',
-                                  'state_NE', 'state_CO', 'state_NM'])
-    oh = ['state_TX', 'state_OK', 'state_KS', 'state_NE', 'state_CO', 'state_NM']
-    ft['state'] = ft[oh].idxmax(axis=1).str.replace('state_', '')
-    ft['state'] = ft['state'].replace({'NM': 'TX'})   # single field-year
+                         columns=['field_id', 'latitude', 'longitude'])
+    ft['field_id'] = ft['field_id'].astype(str)
+    ft = ft.merge(look[['field_id', 'state_true']], on='field_id', how='left')
+    ft = ft.rename(columns={'state_true': 'state'})
+    # New Mexico is shown with Texas, as the nearest study state; the three
+    # centroids outside the study area entirely are excluded.
+    ft['state'] = ft['state'].replace({'NM': 'TX'})
+    ft = ft[ft['state'].isin(ORDER)]
     fld = (ft.groupby(['field_id', 'state'])[['latitude', 'longitude']]
              .mean().reset_index())
     counts = fld.groupby('state')['field_id'].nunique().to_dict()
