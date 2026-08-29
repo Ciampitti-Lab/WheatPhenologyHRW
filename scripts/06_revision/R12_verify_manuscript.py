@@ -148,6 +148,23 @@ def main():
             check(f'Table 5 retained anthesis sigma={sig}', v,
                   round(float(fa.loc[sig, 'pct_retained']), 1), tol=0.06)
 
+    print('\n=== abstract and highlights ===')
+    gf = pd.read_csv(REV / 'R14_grid_full.csv')
+    AD = {'flag_leaf': ('C_Hybrid', 'XGBoost'), 'boot': ('C_Hybrid', 'LightGBM'),
+          'heading': ('C_Hybrid', 'ElasticNet'), 'anthesis': ('C_Hybrid', 'FT')}
+    rr = [float(gf[(gf.stage == k) & (gf.strategy == v[0])
+                   & (gf.model == v[1])].RMSE.iloc[0]) for k, v in AD.items()]
+    check('reproductive RMSE min (d)', 4.6, round(min(rr), 1))
+    check('reproductive RMSE max (d)', 5.9, round(max(rr), 1))
+    r2r = [float(gf[(gf.stage == k) & (gf.strategy == v[0])
+                    & (gf.model == v[1])].R2.iloc[0]) for k, v in AD.items()]
+    check('reproductive R2 min', 0.67, round(min(r2r), 2))
+    check('reproductive R2 max', 0.82, round(max(r2r), 2))
+    for claim in ['4.6--5.9 d RMSE', r'\SIrange{4.6}{5.9}{\day}']:
+        n_ = tex.count(claim)
+        checks.append((n_ >= 1, f'present: "{claim}"', 1, n_))
+        print(f'  [{"OK  " if n_ >= 1 else "FAIL"}] present: {claim:28s} count={n_}')
+
     print('\n=== Supplementary S5, deterministic anchor (R05) ===')
     for st, gain, det, pct in [('flag_leaf', 0.267, 0.193, 72),
                                ('boot', 0.107, 0.103, 96),
