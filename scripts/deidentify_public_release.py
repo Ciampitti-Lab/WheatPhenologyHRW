@@ -37,6 +37,9 @@ DROP_COLS = {'geometry', 'centroid_lat', 'centroid_lon', 'x', 'y'}
 COARSEN_COLS = {'lat': 'lat', 'lon': 'lon',
                 'latitude': 'latitude', 'longitude': 'longitude'}
 GRID_DEG = 0.05
+# The states carrying a one-hot encoder in the feature matrix. A field outside
+# them is outside the study area and is not part of the modelled cohort.
+STUDY_STATES = {'TX', 'OK', 'KS', 'NE', 'CO', 'NM'}
 
 
 # Corrected per-field state assignment (spatial join; see R14a_fix_states.py).
@@ -126,8 +129,14 @@ def main() -> None:
     sl = pd.read_parquet(WORK / 'sowing_lookup.parquet')
     sl = sl[sl['harvest_year'].isin(TRAIN_HARVEST_YEARS)].copy()
 
-    # --- DOS-anchored v3 features (already the 8,465 training cohort) -
+    # --- DOS-anchored v3 features, restricted to the modelled cohort ------
+    # Three fields fall outside the five study states once the spatial join
+    # replaces the latitude box (one of them in Indiana). deep_models.
+    # load_cohort drops them, so the release drops them too and the published
+    # 5,290 fields / 8,461 field-years reproduce exactly.
     fe = pd.read_parquet(WORK / 'features_v3_realsowing_train.parquet')
+    _st = [assign_state(la, lo) for la, lo in zip(fe['latitude'], fe['longitude'])]
+    fe = fe[[s in STUDY_STATES for s in _st]].copy()
 
     key_map = build_field_id_mapping(ph, sl, fe)
 

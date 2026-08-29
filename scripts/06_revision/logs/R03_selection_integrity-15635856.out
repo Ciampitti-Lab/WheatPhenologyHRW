@@ -1,0 +1,39 @@
+=== grid (5 CPU models x 2 strategies) ===
+  Emergence  done
+  Tillering  done
+  Jointing   done
+  Flag leaf  done
+  Boot       done
+  Heading    done
+  Anthesis   done
+  Maturity   done
+  -> data/revision/R03_cpu_grid.csv  (80 rows)
+
+=== pre-specified single model, all stages ===
+  -> data/revision/R03_prespecified_grid.csv  (10 rows)
+ strategy        model  mean_R2  median_R2  min_R2  n_negative
+ C_Hybrid     LightGBM    0.506      0.506   0.268           0
+ C_Hybrid      XGBoost    0.452      0.495  -0.062           1
+ C_Hybrid RandomForest    0.467      0.467   0.217           0
+ C_Hybrid   ElasticNet   -0.866      0.462 -10.452           1
+ C_Hybrid        Ridge   -2.414      0.430 -22.746           1
+B_ML-only     LightGBM    0.421      0.396   0.233           0
+B_ML-only      XGBoost    0.368      0.383  -0.127           1
+B_ML-only RandomForest    0.375      0.331   0.154           0
+B_ML-only        Ridge   -2.431      0.299 -21.562           2
+B_ML-only   ElasticNet    0.144      0.294  -1.525           1
+
+  most stable single choice: C_Hybrid / LightGBM
+
+=== nested LOYO (selection re-made inside every outer fold) ===
+  Emergence  selected=+0.352 nested=+0.304 optimism=+0.048  [2014:Hybrid/RandomForest; 2015:ML-only/XGBoost; 2016:Hybrid/LightGBM; 2017:Hybrid/RandomForest]
+  Tillering  selected=+0.338 nested=+0.278 optimism=+0.060  [2014:Hybrid/RandomForest; 2015:Hybrid/ElasticNet; 2016:Hybrid/ElasticNet; 2017:Hybrid/RandomForest]
+  Jointing   selected=+0.329 nested=+0.205 optimism=+0.124  [2014:Hybrid/LightGBM; 2015:ML-only/ElasticNet; 2016:Hybrid/RandomForest; 2017:Hybrid/RandomForest]
+  Flag leaf  selected=+0.706 nested=+0.687 optimism=+0.019  [2014:Hybrid/LightGBM; 2015:Hybrid/LightGBM; 2016:Hybrid/XGBoost; 2017:Hybrid/XGBoost]
+  Boot       selected=+0.672 nested=+0.564 optimism=+0.108  [2014:Hybrid/ElasticNet; 2015:Hybrid/LightGBM; 2016:Hybrid/XGBoost; 2017:Hybrid/ElasticNet]
+  Heading    selected=+0.732 nested=+0.732 optimism=+0.000  [2014:Hybrid/ElasticNet; 2015:Hybrid/ElasticNet; 2016:Hybrid/ElasticNet; 2017:Hybrid/ElasticNet]
+  Anthesis   selected=+0.801 nested=+0.785 optimism=+0.016  [2014:Hybrid/ElasticNet; 2015:ML-only/ElasticNet; 2016:Hybrid/ElasticNet; 2017:Hybrid/ElasticNet]
+  Maturity   selected=+0.341 nested=+0.299 optimism=+0.042  [2014:Hybrid/ElasticNet; 2015:Hybrid/Ridge; 2016:Hybrid/Ridge; 2017:ML-only/LightGBM]
+  -> data/revision/R03_selection_integrity.csv  (8 rows)
+
+mean selection optimism (CPU grid): +0.052 R2 units

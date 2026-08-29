@@ -1,0 +1,44 @@
+  r=150 raw flag_leaf  R2=+0.710 RMSE= 6.68 n=772
+  r=150 raw boot       R2=+0.678 RMSE= 6.70 n=590
+  r=150 raw heading    R2=+0.757 RMSE= 6.38 n=676
+  r=150 raw anthesis   R2=+0.882 RMSE= 4.63 n=349
+  r=150 cdl flag_leaf  R2=+0.756 RMSE= 6.28 n=697
+  r=150 cdl boot       R2=+0.726 RMSE= 6.38 n=528
+  r=150 cdl heading    R2=+0.746 RMSE= 6.51 n=608
+  r=150 cdl anthesis   R2=+0.874 RMSE= 4.74 n=315
+  r=300 raw flag_leaf  R2=+0.687 RMSE= 6.94 n=772
+  r=300 raw boot       R2=+0.702 RMSE= 6.45 n=590
+  r=300 raw heading    R2=+0.747 RMSE= 6.51 n=676
+  r=300 raw anthesis   R2=+0.881 RMSE= 4.63 n=349
+  r=300 cdl flag_leaf  R2=+0.722 RMSE= 6.64 n=731
+  r=300 cdl boot       R2=+0.704 RMSE= 6.56 n=553
+  r=300 cdl heading    R2=+0.744 RMSE= 6.54 n=636
+  r=300 cdl anthesis   R2=+0.891 RMSE= 4.47 n=327
+  r=500 raw flag_leaf  R2=+0.657 RMSE= 7.26 n=772
+  r=500 raw boot       R2=+0.707 RMSE= 6.39 n=590
+  r=500 raw heading    R2=+0.743 RMSE= 6.57 n=676
+  r=500 raw anthesis   R2=+0.875 RMSE= 4.77 n=349
+  r=500 cdl flag_leaf  R2=+0.717 RMSE= 6.61 n=770
+  r=500 cdl boot       R2=+0.716 RMSE= 6.30 n=587
+  r=500 cdl heading    R2=+0.756 RMSE= 6.39 n=676
+  r=500 cdl anthesis   R2=+0.886 RMSE= 4.55 n=349
+
+=== LOYO R2 by radius and mask (LightGBM fixed) ===
+mask         cdl                  raw              
+radius       150    300    500    150    300    500
+stage                                              
+flag_leaf  0.756  0.722  0.717  0.710  0.687  0.657
+boot       0.726  0.704  0.716  0.678  0.702  0.707
+heading    0.746  0.744  0.756  0.757  0.747  0.743
+anthesis   0.874  0.891  0.886  0.882  0.881  0.875
+
+=== deviation from the 300 m unmasked control ===
+mask         cdl                  raw            
+radius       150    300    500    150  300    500
+stage                                            
+flag_leaf  0.069  0.036  0.030  0.023  0.0 -0.029
+boot       0.025  0.002  0.015 -0.024  0.0  0.006
+heading   -0.002 -0.004  0.009  0.010  0.0 -0.005
+anthesis  -0.008  0.009  0.004  0.000  0.0 -0.007
+
+largest |deviation| across all configurations: 0.069 R2

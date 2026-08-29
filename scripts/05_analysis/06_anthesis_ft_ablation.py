@@ -26,7 +26,8 @@ OUT = WORK / 'v3_results'; OUT.mkdir(parents=True, exist_ok=True)
 SIGMAS = [7, 14, 21, 28]; N_REPS = 3; SEEDS = [0, 1, 2, 3, 4]
 LBL = ['Early Bloom', 'Bloom']
 META_FIXED = ['field_id', 'year', 'flag_true_doy', 'n_obs', 'sowing_doy_used']
-REDUND = ['GDD_M2_at_SOS', 'VD_at_SOS', 'emergence_doy', 'VD_from_emergence_at_SOS',
+REDUND = ['ph_top',
+          'GDD_M2_at_SOS', 'VD_at_SOS', 'emergence_doy', 'VD_from_emergence_at_SOS',
           'fV_from_emergence_at_SOS', 'days_emergence_to_SOS']
 
 
@@ -51,6 +52,15 @@ def main():
          .min().reset_index().rename(columns={'dos': tgt}))
     fe = pd.read_parquet(WORK / 'features_v3_realsowing_train.parquet')
     fe['field_id'] = fe['field_id'].astype(str); fe['year'] = fe['year'].astype(int)
+    # same cohort as every other analysis (see deep_models._apply_corrected_states)
+    from scripts.utils.deep_models import _apply_corrected_states
+    fe = _apply_corrected_states(fe)
+    if '_state_true' in fe.columns:
+        before = len(fe)
+        fe = fe[fe['_state_true'].notna()].copy()
+        fe = fe.drop(columns=['_state_true'])
+        print(f'corrected states applied; dropped {before - len(fe)} '
+              f'out-of-area field-years', flush=True)
     if 'state' in fe.columns:
         fe = fe.drop(columns=['state'])
     fe = fe.merge(e, on=['field_id', 'year'], how='left')

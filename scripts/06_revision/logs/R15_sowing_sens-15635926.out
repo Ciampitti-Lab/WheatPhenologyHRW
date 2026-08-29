@@ -1,0 +1,77 @@
+=== Loading inputs ===
+corrected states applied; dropped 4 out-of-area field-years
+Training field-years: 8461  fallback: 7079 (83.7%)  observed: 1382
+=== Indexing daymet ===
+[control] flag_leaf ML=0.439  hybrid=0.706  gain=+0.267
+[control] boot      ML=0.563  hybrid=0.670  gain=+0.107
+[control] heading   ML=0.298  hybrid=0.732  gain=+0.434
+[control] anthesis  ML=0.709  hybrid=0.801  gain=+0.092
+[s= 7 r1] flag_leaf resim=7079 hybrid=0.682 gain=+0.244
+[s= 7 r1] boot      resim=7079 hybrid=0.666 gain=+0.103
+[s= 7 r1] heading   resim=7079 hybrid=0.700 gain=+0.402
+[s= 7 r1] anthesis  resim=7079 hybrid=0.802 gain=+0.093
+[s= 7 r2] flag_leaf resim=7079 hybrid=0.648 gain=+0.209
+[s= 7 r2] boot      resim=7079 hybrid=0.664 gain=+0.101
+[s= 7 r2] heading   resim=7079 hybrid=0.712 gain=+0.415
+[s= 7 r2] anthesis  resim=7079 hybrid=0.801 gain=+0.092
+[s= 7 r3] flag_leaf resim=7079 hybrid=0.693 gain=+0.255
+[s= 7 r3] boot      resim=7079 hybrid=0.679 gain=+0.116
+[s= 7 r3] heading   resim=7079 hybrid=0.713 gain=+0.415
+[s= 7 r3] anthesis  resim=7079 hybrid=0.807 gain=+0.098
+[s=14 r1] flag_leaf resim=7079 hybrid=0.623 gain=+0.185
+[s=14 r1] boot      resim=7079 hybrid=0.671 gain=+0.108
+[s=14 r1] heading   resim=7079 hybrid=0.717 gain=+0.419
+[s=14 r1] anthesis  resim=7079 hybrid=0.805 gain=+0.096
+[s=14 r2] flag_leaf resim=7079 hybrid=0.659 gain=+0.220
+[s=14 r2] boot      resim=7079 hybrid=0.671 gain=+0.108
+[s=14 r2] heading   resim=7079 hybrid=0.708 gain=+0.410
+[s=14 r2] anthesis  resim=7079 hybrid=0.804 gain=+0.095
+[s=14 r3] flag_leaf resim=7079 hybrid=0.682 gain=+0.243
+[s=14 r3] boot      resim=7079 hybrid=0.657 gain=+0.094
+[s=14 r3] heading   resim=7079 hybrid=0.703 gain=+0.406
+[s=14 r3] anthesis  resim=7079 hybrid=0.798 gain=+0.089
+[s=21 r1] flag_leaf resim=7079 hybrid=0.666 gain=+0.228
+[s=21 r1] boot      resim=7079 hybrid=0.682 gain=+0.119
+[s=21 r1] heading   resim=7079 hybrid=0.683 gain=+0.385
+[s=21 r1] anthesis  resim=7079 hybrid=0.733 gain=+0.024
+[s=21 r2] flag_leaf resim=7079 hybrid=0.643 gain=+0.204
+[s=21 r2] boot      resim=7079 hybrid=0.665 gain=+0.102
+[s=21 r2] heading   resim=7079 hybrid=0.680 gain=+0.382
+[s=21 r2] anthesis  resim=7079 hybrid=0.800 gain=+0.091
+[s=21 r3] flag_leaf resim=7079 hybrid=0.662 gain=+0.224
+[s=21 r3] boot      resim=7079 hybrid=0.663 gain=+0.100
+[s=21 r3] heading   resim=7079 hybrid=0.696 gain=+0.398
+[s=21 r3] anthesis  resim=7079 hybrid=0.754 gain=+0.045
+[s=28 r1] flag_leaf resim=7079 hybrid=0.598 gain=+0.159
+[s=28 r1] boot      resim=7079 hybrid=0.649 gain=+0.086
+[s=28 r1] heading   resim=7079 hybrid=0.678 gain=+0.380
+[s=28 r1] anthesis  resim=7079 hybrid=0.797 gain=+0.087
+[s=28 r2] flag_leaf resim=7079 hybrid=0.584 gain=+0.145
+[s=28 r2] boot      resim=7079 hybrid=0.643 gain=+0.080
+[s=28 r2] heading   resim=7079 hybrid=0.691 gain=+0.393
+[s=28 r2] anthesis  resim=7079 hybrid=0.737 gain=+0.028
+[s=28 r3] flag_leaf resim=7079 hybrid=0.585 gain=+0.146
+[s=28 r3] boot      resim=7079 hybrid=0.668 gain=+0.105
+[s=28 r3] heading   resim=7079 hybrid=0.689 gain=+0.391
+[s=28 r3] anthesis  resim=7079 hybrid=0.791 gain=+0.081
+
+=== SUMMARY (gain = R2 hybrid - R2 ML-only) ===
+    stage  sigma  gain_control  gain_mean  gain_sd  pct_retained
+flag_leaf      7        0.2674     0.2358   0.0239          88.2
+flag_leaf     14        0.2674     0.2158   0.0294          80.7
+flag_leaf     21        0.2674     0.2185   0.0127          81.7
+flag_leaf     28        0.2674     0.1501   0.0080          56.1
+     boot      7        0.1073     0.1066   0.0082          99.4
+     boot     14        0.1073     0.1032   0.0082          96.2
+     boot     21        0.1073     0.1067   0.0106          99.5
+     boot     28        0.1073     0.0904   0.0127          84.2
+  heading      7        0.4338     0.4106   0.0075          94.7
+  heading     14        0.4338     0.4115   0.0067          94.9
+  heading     21        0.4338     0.3883   0.0084          89.5
+  heading     28        0.4338     0.3878   0.0071          89.4
+ anthesis      7        0.0920     0.0942   0.0033         102.4
+ anthesis     14        0.0920     0.0934   0.0038         101.5
+ anthesis     21        0.0920     0.0533   0.0345          57.9
+ anthesis     28        0.0920     0.0657   0.0325          71.4
+
+Done in 16.4 min

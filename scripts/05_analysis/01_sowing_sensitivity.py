@@ -56,6 +56,7 @@ from lightgbm import LGBMRegressor
 
 import sys
 from scripts.utils.thermal import simulate_wes
+from scripts.utils.deep_models import _apply_corrected_states
 
 EXT = _WORK
 TRAIN_FEAT = EXT / 'features_v3_realsowing_train.parquet'
@@ -82,7 +83,7 @@ STAGE_MAP = {
 META_FIXED = ['field_id', 'year', 'flag_true_doy', 'n_obs', 'sowing_doy_used']
 REDUND = ['GDD_M2_at_SOS', 'VD_at_SOS', 'emergence_doy',
           'VD_from_emergence_at_SOS', 'fV_from_emergence_at_SOS',
-          'days_emergence_to_SOS']
+          'days_emergence_to_SOS', 'ph_top']
 WE_OUTPUTS = ['WE_emergence_doy', 'WE_tillering_doy', 'WE_jointing_doy',
               'WE_flag_leaf_doy', 'WE_boot_doy', 'WE_heading_doy',
               'WE_anthesis_doy', 'WE_maturity_doy']
@@ -174,6 +175,13 @@ def main():
     feat = pd.read_parquet(TRAIN_FEAT)
     feat['field_id'] = feat['field_id'].astype(str)
     feat['year'] = feat['year'].astype(int)
+    feat = _apply_corrected_states(feat)
+    if '_state_true' in feat.columns:
+        before = len(feat)
+        feat = feat[feat['_state_true'].notna()].copy()
+        feat = feat.drop(columns=['_state_true'])
+        print(f'corrected states applied; dropped {before - len(feat)} '
+              f'out-of-area field-years', flush=True)
     if 'state' in feat.columns:
         feat = feat.drop(columns=['state'])
     pheno = pd.read_parquet(PHENO_PATH)

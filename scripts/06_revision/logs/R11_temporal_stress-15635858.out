@@ -1,0 +1,22 @@
+=== label coverage of the ground record ===
+  -> data/revision/R11_label_coverage.csv  (6 rows)
+ harvest_year  observations  fields  emergence  tillering  jointing  flag_leaf  boot  heading  anthesis  maturity
+         2013         10470    1862        107       1021      1456        634   417      529       277        75
+         2014         14122    2060       1040       1350      1203        558   370      514       228        79
+         2015         16300    2305       1118       1411      1437        773   733      830       435       112
+         2016         15597    2312       1060       1099      1506        829   776      697       431       102
+         2017         12284    1789       1001        946      1071        547   483      726       392        69
+         2018          3100    1100        863          0         0          0     0        0         0         0
+
+The record ends at harvest 2018, which carries emergence only.
+A reproductive-stage evaluation on 2018/19-2023/24 is not possible.
+
+  Emergence  LOYO=+0.338  L2YO mean=+0.339 [+0.241, +0.449]  drop=-0.001
+  Tillering  LOYO=+0.268  L2YO mean=+0.190 [+0.037, +0.304]  drop=+0.079
+  Jointing   LOYO=+0.329  L2YO mean=+0.256 [+0.191, +0.335]  drop=+0.073
+  Flag leaf  LOYO=+0.700  L2YO mean=+0.589 [+0.476, +0.693]  drop=+0.111
+  Boot       LOYO=+0.670  L2YO mean=+0.562 [+0.186, +0.688]  drop=+0.108
+  Heading    LOYO=+0.712  L2YO mean=+0.590 [+0.107, +0.710]  drop=+0.122
+  Anthesis   LOYO=+0.691  L2YO mean=+0.648 [+0.370, +0.789]  drop=+0.043
+  Maturity   LOYO=+0.341  L2YO mean=+0.250 [-0.196, +0.369]  drop=+0.091
+  -> data/revision/R11_temporal_stress.csv  (8 rows)

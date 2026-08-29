@@ -74,9 +74,24 @@ def main():
     r3 = pd.read_csv(REV / 'R03_selection_integrity.csv').set_index('stage')
     for st in r3.index:
         check(f'Table 6 nested {st}', None, None) if False else None
-    check('Table 6 mean optimism', 0.036, round(r3.optimism.mean(), 3))
-    for st, v in [('heading', 0.006), ('anthesis', 0.000)]:
+    check('Table 6 mean optimism', 0.052, round(r3.optimism.mean(), 3))
+    # every row of Table 6, so the table cannot drift from the CSV again
+    for st, v in [('emergence', 0.048), ('tillering', 0.060), ('jointing', 0.124),
+                  ('flag_leaf', 0.019), ('boot', 0.108), ('heading', 0.000),
+                  ('anthesis', 0.016), ('maturity', 0.042)]:
         check(f'Table 6 optimism {st}', v, round(r3.loc[st, 'optimism'], 3))
+    for st, v in [('emergence', 0.352), ('tillering', 0.338), ('jointing', 0.329),
+                  ('flag_leaf', 0.706), ('boot', 0.672), ('heading', 0.732),
+                  ('anthesis', 0.801), ('maturity', 0.341)]:
+        check(f'Table 6 selected {st}', v, round(r3.loc[st, 'R2_selected'], 3))
+    for st, v in [('emergence', 0.338), ('tillering', 0.268), ('jointing', 0.329),
+                  ('flag_leaf', 0.700), ('boot', 0.670), ('heading', 0.712),
+                  ('anthesis', 0.691), ('maturity', 0.341)]:
+        check(f'Table 6 pre-specified {st}', v,
+              round(r3.loc[st, 'R2_prespecified'], 3))
+    check('Table 6 physiology-informed picks (of 32)', 28,
+          sum(p.strip().split(':')[1].split('/')[0] == 'Hybrid'
+              for picks in r3.inner_picks for p in picks.split(';')))
 
     print('\n=== Table 7, label bound (R02) ===')
     r2f = pd.read_csv(REV / 'R02_label_uncertainty.csv').set_index('stage')
@@ -104,27 +119,55 @@ def main():
     print('\n=== Sec 3.4, fold-derived sowing (R05) ===')
     r5 = pd.read_csv(REV / 'R05_fold_derived_sowing.csv')
     pv = r5.pivot_table(index='stage', columns='variant', values='pct_retained')
-    for st, fm, fs in [('flag_leaf', 95, 88), ('boot', 88, 83),
-                       ('heading', 97, 92), ('anthesis', 91, 36)]:
+    for st, fm, fs in [('flag_leaf', 101, 96), ('boot', 105, 104),
+                       ('heading', 96, 98), ('anthesis', 93, 25)]:
         check(f'fold-median retained {st} (%)', fm,
               round(pv.loc[st, 'fold_median']), tol=0.6)
         check(f'fold-strict retained {st} (%)', fs,
               round(pv.loc[st, 'fold_strict']), tol=0.6)
 
+    print('\n=== Table 5, sowing-anchor perturbation (R15/R16) ===')
+    V3 = Path('/depot/ciampitti/data/WheatPhenologyHRW/data/raw/satellite/'
+              'extension_2018_2024/v3_results')
+    ss = pd.read_csv(V3 / 'sowing_sensitivity_summary.csv')
+    sp = ss.pivot_table(index='stage', columns='sigma', values='pct_retained')
+    sg = ss.groupby('stage').gain_control.first()
+    for st, gain, ret in [('flag_leaf', 0.267, (88.2, 80.7, 81.7, 56.1)),
+                          ('boot', 0.107, (99.4, 96.2, 99.5, 84.2)),
+                          ('heading', 0.434, (94.7, 94.9, 89.5, 89.4))]:
+        check(f'Table 5 control gain {st}', gain, round(float(sg.loc[st]), 3))
+        for sig, v in zip((7, 14, 21, 28), ret):
+            check(f'Table 5 retained {st} sigma={sig}', v,
+                  round(float(sp.loc[st, sig]), 1), tol=0.06)
+    ft = V3 / 'anthesis_ft_ablation_summary.csv'
+    if ft.exists():
+        fa = pd.read_csv(ft).set_index('sigma')
+        check('Table 5 control gain anthesis (FT)', 0.026,
+              round(float(fa.gain_control.iloc[0]), 3))
+        for sig, v in zip((7, 14, 21, 28), (84.5, 87.3, 74.1, 71.0)):
+            check(f'Table 5 retained anthesis sigma={sig}', v,
+                  round(float(fa.loc[sig, 'pct_retained']), 1), tol=0.06)
+
     print('\n=== Sec 3.6, leave-two-years-out (R11) ===')
     r11 = pd.read_csv(REV / 'R11_temporal_stress.csv').set_index('stage')
-    check('L2YO mean loss, all stages', 0.086, round(r11['drop'].mean(), 3))
-    check('L2YO mean loss, reproductive', 0.101,
+    check('L2YO mean loss, all stages', 0.078, round(r11['drop'].mean(), 3))
+    check('L2YO mean loss, reproductive', 0.096,
           round(r11.loc[rep, 'drop'].mean(), 3))
-    check('L2YO worst heading', 0.100, round(r11.loc['heading', 'R2_l2yo_min'], 3))
-    check('L2YO worst boot', 0.215, round(r11.loc['boot', 'R2_l2yo_min'], 3))
+    check('L2YO worst heading', 0.107, round(r11.loc['heading', 'R2_l2yo_min'], 3))
+    check('L2YO worst boot', 0.186, round(r11.loc['boot', 'R2_l2yo_min'], 3))
 
     print('\n=== Sec 3.5, grouped permutation importance (R08) ===')
     sh8 = pd.read_csv(REV / 'R08_importance_share.csv').set_index('stage')
     check('WES share flag leaf (%)', 82, round(sh8.loc['flag_leaf', 'WES']), tol=0.6)
-    check('Site share emergence (%)', 51, round(sh8.loc['emergence', 'Site']), tol=0.6)
-    check('Site share maturity (%)', 51, round(sh8.loc['maturity', 'Site']), tol=0.6)
-    check('HLS share emergence (%)', 26, round(sh8.loc['emergence', 'HLS']), tol=0.6)
+    check('Site share emergence (%)', 53, round(sh8.loc['emergence', 'Site']), tol=0.6)
+    check('Site share maturity (%)', 50, round(sh8.loc['maturity', 'Site']), tol=0.6)
+    check('HLS share emergence (%)', 27, round(sh8.loc['emergence', 'HLS']), tol=0.6)
+    r8 = pd.read_csv(REV / 'R08_grouped_permutation.csv').set_index(['stage', 'group'])
+    check('WES flag-leaf permutation loss', 0.54,
+          round(float(r8.loc[('flag_leaf', 'WES'), 'drop_mean']), 2))
+    check('Daymet share min (%)', 4, round(sh8['Daymet'].min()), tol=0.6)
+    check('Daymet share max (%)', 18, round(sh8['Daymet'].max()), tol=0.6)
+    check('State encoders inert everywhere (%)', 0.0, round(sh8['State'].max(), 1))
 
     print('\n=== cohort counts quoted in Table 2 ===')
     cov = pd.read_csv(REV / 'R11_label_coverage.csv')
@@ -148,15 +191,23 @@ def main():
     print('\n=== Table 9, buffer sensitivity (R13d) ===')
     bs = pd.read_csv(REV / 'R13_buffer_sensitivity.csv')
     pv = bs.pivot_table(index='stage', columns=['mask', 'radius'], values='R2')
-    for st, mk, rd, claimed in [('flag_leaf', 'raw', 300, 0.696),
-                                ('flag_leaf', 'cdl', 150, 0.755),
-                                ('boot', 'raw', 300, 0.707),
-                                ('heading', 'raw', 300, 0.751),
-                                ('anthesis', 'raw', 300, 0.882),
-                                ('flag_leaf', 'raw', 500, 0.660)]:
-        check(f'Table 9 {st} {mk} r={rd}', claimed, round(pv.loc[st, (mk, rd)], 3))
-    check('largest |deviation| from the control', 0.059,
+    # every cell of Table 9
+    for st, row in [('flag_leaf', dict(raw=(0.710, 0.687, 0.657),
+                                       cdl=(0.756, 0.722, 0.717))),
+                    ('boot',      dict(raw=(0.678, 0.702, 0.707),
+                                       cdl=(0.726, 0.704, 0.716))),
+                    ('heading',   dict(raw=(0.757, 0.747, 0.743),
+                                       cdl=(0.746, 0.744, 0.756))),
+                    ('anthesis',  dict(raw=(0.882, 0.881, 0.875),
+                                       cdl=(0.874, 0.891, 0.886)))]:
+        for mk, vals in row.items():
+            for rd, claimed in zip((150, 300, 500), vals):
+                check(f'Table 9 {st} {mk} r={rd}', claimed,
+                      round(pv.loc[st, (mk, rd)], 3))
+    check('largest |deviation| from the control', 0.069,
           round(bs.delta_vs_300raw.abs().max(), 3))
+    check('deviations at or above 0.04 (count)', 1,
+          int((bs.delta_vs_300raw.abs() >= 0.04).sum()))
 
     print('\n=== corrected state assignment (R14) ===')
     lk = pd.read_csv(REV / 'R14_state_lookup.csv')

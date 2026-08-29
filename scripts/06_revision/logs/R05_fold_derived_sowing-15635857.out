@@ -1,0 +1,35 @@
+  -> data/revision/R05_fold_medians.csv  (24 rows)
+fold-derived vs global state median: |shift| mean=1.52 d  max=7.5 d
+
+loading Daymet ...
+  weather for 6120 fields
+
+  resimulated fold_median  holdout 2014: 8453 field-years (84s)
+  resimulated fold_strict  holdout 2014: 8452 field-years (84s)
+  resimulated fold_median  holdout 2015: 8461 field-years (85s)
+  resimulated fold_strict  holdout 2015: 8461 field-years (85s)
+  resimulated fold_median  holdout 2016: 8461 field-years (84s)
+  resimulated fold_strict  holdout 2016: 8461 field-years (84s)
+  resimulated fold_median  holdout 2017: 8461 field-years (85s)
+  resimulated fold_strict  holdout 2017: 8461 field-years (85s)
+  Flag leaf  control      hybrid=+0.706 gain=+0.267 (2.3s)
+  Flag leaf  fold_median  hybrid=+0.709 gain=+0.270 (2.3s)
+  Flag leaf  fold_strict  hybrid=+0.694 gain=+0.256 (2.2s)
+  Boot       control      hybrid=+0.670 gain=+0.107 (0.8s)
+  Boot       fold_median  hybrid=+0.676 gain=+0.113 (0.8s)
+  Boot       fold_strict  hybrid=+0.675 gain=+0.112 (0.9s)
+  Heading    control      hybrid=+0.732 gain=+0.434 (2.1s)
+  Heading    fold_median  hybrid=+0.715 gain=+0.417 (2.2s)
+  Heading    fold_strict  hybrid=+0.721 gain=+0.423 (2.3s)
+  Anthesis   control      hybrid=+0.801 gain=+0.092 (1.9s)
+  Anthesis   fold_median  hybrid=+0.795 gain=+0.086 (2.0s)
+  Anthesis   fold_strict  hybrid=+0.733 gain=+0.023 (2.0s)
+  -> data/revision/R05_fold_derived_sowing.csv  (12 rows)
+
+=== gain retained under a training-fold-derived anchor (%) ===
+variant    control  fold_median  fold_strict
+stage                                       
+anthesis     100.0         93.0         25.4
+boot         100.0        105.4        104.5
+flag_leaf    100.0        100.9         95.6
+heading      100.0         96.1         97.6

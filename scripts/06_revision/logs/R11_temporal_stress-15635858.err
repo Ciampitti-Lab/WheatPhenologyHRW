@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/vmangidi/repositories/WheatPhenologyHRW/scripts/06_revision/R11_temporal_stress.py", line 124, in <module>
+    main()
+  File "/home/vmangidi/repositories/WheatPhenologyHRW/scripts/06_revision/R11_temporal_stress.py", line 118, in main
+    f'{R.drop.mean():+.3f} R2')
+       ^^^^^^^^^^^
+AttributeError: 'function' object has no attribute 'mean'
+srun: error: a004: task 0: Exited with exit code 1

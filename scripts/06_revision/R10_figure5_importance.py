@@ -50,13 +50,16 @@ def main():
     pos = imp.clip(lower=0)
     share = 100 * pos.div(pos.sum(axis=1), axis=0)
 
-    fig, axes = plt.subplots(1, 2, figsize=(12.4, 5.2),
-                             gridspec_kw={'width_ratios': [1.15, 1]})
+    fig, axes = plt.subplots(2, 1, figsize=(8.6, 9.2),
+                             gridspec_kw={'height_ratios': [1.3, 1]})
     y = np.arange(len(ORDER))[::-1]
 
     # --- Panel A: absolute loss, grouped bars -----------------------------
     ax = axes[0]
-    h = 0.11
+    h = 0.118
+    for k, yy in enumerate(y):
+        if k % 2 == 0:
+            ax.axhspan(yy - 0.5, yy + 0.5, color='#f2f0ec', zorder=0)
     for i, g in enumerate(GROUPS):
         off = (i - (len(GROUPS) - 1) / 2) * h
         ax.barh(y + off, imp[g].values, height=h, color=COLOR[g],
@@ -69,6 +72,7 @@ def main():
     ax.set_title('A. Absolute importance', loc='left', fontsize=11,
                  fontweight='bold')
     ax.grid(axis='x', ls=':', color='#cccccc', lw=0.6)
+    ax.set_ylim(y.min() - 0.5, y.max() + 0.5)
     ax.set_axisbelow(True)
     for sp in ('top', 'right'):
         ax.spines[sp].set_visible(False)
@@ -88,21 +92,21 @@ def main():
                         else '#333333')
         left += v
     ax.set_yticks(y)
-    ax.set_yticklabels([])
+    ax.set_yticklabels([LABEL[s] for s in ORDER])
     ax.set_xlim(0, 100)
     ax.set_xlabel('Share of total positive importance (%)')
     ax.set_title('B. Relative composition', loc='left', fontsize=11,
                  fontweight='bold')
-    for sp in ('top', 'right', 'left'):
+    for sp in ('top', 'right'):
         ax.spines[sp].set_visible(False)
 
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='lower center', ncol=7, frameon=False,
-               fontsize=9, bbox_to_anchor=(0.5, -0.02))
-    fig.suptitle('Grouped permutation importance by input source '
+    fig.legend(handles, labels, loc='lower center', ncol=4, frameon=False,
+               fontsize=9.5, bbox_to_anchor=(0.5, 0.004))
+    fig.suptitle('Grouped permutation importance by input source\n'
                  '(LightGBM, identical protocol at every stage)',
-                 fontsize=12, fontweight='bold', y=1.0)
-    fig.tight_layout(rect=[0, 0.06, 1, 0.97])
+                 fontsize=12.5, fontweight='bold', y=0.998)
+    fig.tight_layout(rect=[0, 0.062, 1, 0.955])
 
     OUT.mkdir(parents=True, exist_ok=True)
     for ext in ('pdf', 'png'):
