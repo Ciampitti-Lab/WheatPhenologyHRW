@@ -58,9 +58,12 @@ def main():
     if '_state_true' in fe.columns:
         before = len(fe)
         fe = fe[fe['_state_true'].notna()].copy()
+        fe['_state_keep'] = fe['_state_true']
         fe = fe.drop(columns=['_state_true'])
         print(f'corrected states applied; dropped {before - len(fe)} '
               f'out-of-area field-years', flush=True)
+    _state = (fe['_state_keep'] if '_state_keep' in fe.columns
+              else fe.get('state'))
     if 'state' in fe.columns:
         fe = fe.drop(columns=['state'])
     fe = fe.merge(e, on=['field_id', 'year'], how='left')
@@ -98,6 +101,39 @@ def main():
     r2_ml = ft_loyo(trim(fe), mlo, tgt)
     g0 = ft_loyo(trim(fe), hyb, tgt) - r2_ml
     print(f'[control] anthesis FT  gain={g0:+.4f}', flush=True)
+    # --- deterministic anchor (Supplementary S5) -------------------------
+    # Replace every *observed* sowing date with the whole-cohort state median,
+    # re-simulate those rows, refit. This isolates the observed-anchor leakage
+    # channel on its own; R05's fold_strict closes it together with the fold
+    # channel and so bounds it more tightly.
+    med = (fe.loc[~is_fb].groupby('_state_keep')['sow_base'].median()
+           if '_state_keep' in fe.columns else pd.Series(dtype=float))
+    det = fe.copy(); wed = {c: det[c].values.copy() for c in WE}
+    n_det = 0
+    for j in np.where(~is_fb)[0]:
+        fid, hy = det['field_id'].values[j], det['year'].values[j]
+        a = med.get(det['_state_keep'].values[j], np.nan)
+        wx = wx_by.get((fid, hy))
+        if wx is None or len(wx) == 0 or not np.isfinite(a):
+            continue
+        we = simulate_wes(wx, lat=float(lat_by.get((fid, hy), 38.0)),
+                          sowing_doy=int(a), sowing_year=int(hy),
+                          return_dos=False)
+        for c in WE:
+            if c in we:
+                wed[c][j] = we[c]
+        n_det += 1
+    for c in WE:
+        det[c] = wed[c]
+    g_det = ft_loyo(trim(det), hyb, tgt) - r2_ml
+    print(f'[determ ] anthesis FT  gain={g_det:+.4f}  '
+          f'({n_det} observed anchors replaced, retained '
+          f'{100 * g_det / g0:.1f}%)', flush=True)
+    pd.DataFrame([dict(stage='anthesis', model='FT', variant='deterministic',
+                       gain_control=round(g0, 4), gain_det=round(g_det, 4),
+                       pct_retained=round(100 * g_det / g0, 1))]).to_csv(
+        OUT / 'anthesis_ft_deterministic.csv', index=False)
+
     fb_idx = np.where(is_fb)[0]
     fb_keys = list(zip(fe['field_id'].values[fb_idx], fe['year'].values[fb_idx],
                        fe['sow_base'].values[fb_idx]))

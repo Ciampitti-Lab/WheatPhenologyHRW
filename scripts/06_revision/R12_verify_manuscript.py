@@ -148,6 +148,28 @@ def main():
             check(f'Table 5 retained anthesis sigma={sig}', v,
                   round(float(fa.loc[sig, 'pct_retained']), 1), tol=0.06)
 
+    print('\n=== Supplementary S5, deterministic anchor (R05) ===')
+    for st, gain, det, pct in [('flag_leaf', 0.267, 0.193, 72),
+                               ('boot', 0.107, 0.103, 96),
+                               ('heading', 0.434, 0.406, 94),
+                               ]:
+        d = r5[(r5.stage == st) & (r5.variant == 'deterministic')].iloc[0]
+        c = r5[(r5.stage == st) & (r5.variant == 'control')].iloc[0]
+        check(f'S5 control gain {st}', gain, round(float(c.gain), 3))
+        check(f'S5 deterministic gain {st}', det, round(float(d.gain), 3))
+        check(f'S5 retained {st} (%)', pct, round(float(d.pct_retained)), tol=0.6)
+    # the anthesis row of Table S5 uses the adopted FT-Transformer, which R05
+    # (CPU only) cannot fit; it comes from 05_analysis/06_anthesis_ft_ablation
+    fd = V3 / 'anthesis_ft_deterministic.csv'
+    if fd.exists():
+        a = pd.read_csv(fd).iloc[0]
+        check('S5 anthesis FT control gain', 0.026,
+              round(float(a.gain_control), 3))
+        check('S5 anthesis FT deterministic gain', 0.017,
+              round(float(a.gain_det), 3))
+        check('S5 anthesis FT retained (%)', 67,
+              round(float(a.pct_retained)), tol=0.6)
+
     print('\n=== Sec 3.6, leave-two-years-out (R11) ===')
     r11 = pd.read_csv(REV / 'R11_temporal_stress.csv').set_index('stage')
     check('L2YO mean loss, all stages', 0.078, round(r11['drop'].mean(), 3))
@@ -228,7 +250,20 @@ def main():
                      ('transferability is strong', 'withdrawn transfer claim'),
                      ('only CDL-wheat pixels enter', 'unapplied CDL mask claim'),
                      ('five of eight', 'superseded strategy tally'),
-                     ('\\num{5293}', 'pre-correction field count')]:
+                     ('\\num{5293}', 'pre-correction field count'),
+                     ('\\num{8465}', 'pre-correction field-year count'),
+                     # superseded values that survived in prose after the
+                     # tables were regenerated. Each was found by hand twice.
+                     ('$+0.036$', 'pre-correction selection optimism'),
+                     ('{0.102}', 'pre-correction anthesis control gain'),
+                     ('{88}{97}', 'pre-correction fold-median range'),
+                     ('{83}{92}', 'pre-correction fold-strict range'),
+                     ('{0.086}', 'pre-correction L2YO mean loss'),
+                     ('{0.059}', 'pre-correction buffer bound'),
+                     ('\\subsection{Where the information lives',
+                      'Discussion subsection heading'),
+                     ('\\subsection{Limitations}',
+                      'Discussion subsection heading')]:
         n = tex.count(bad)
         checks.append((n == 0, f'no "{bad}" ({why})', 0, n))
         print(f'  [{"OK  " if n == 0 else "FAIL"}] absent: {why:38s} count={n}')

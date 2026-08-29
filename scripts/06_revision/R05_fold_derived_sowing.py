@@ -100,9 +100,21 @@ def main():
     keys = fe[['field_id', 'year', 'state']].drop_duplicates()
 
     def resimulate(year, variant):
-        """WE_* table for every field-year, under a training-fold anchor."""
-        med = (sw[(sw.harvest_year != year) & (sw.source != 'state_median')]
-               .groupby('state')['sowing_doy_used'].median())
+        """WE_* table for every field-year, under a re-derived anchor.
+
+        `deterministic` is the weaker, non-fold-wise version of the same
+        test: every observed anchor is replaced by the state median computed
+        over the whole cohort, which is what the anchor would be if the
+        survey had never recorded a sowing date. It answers the observed-
+        anchor leakage channel on its own; `fold_strict` additionally closes
+        the fold-leakage channel and therefore bounds it more tightly.
+        """
+        if variant == 'deterministic':
+            med = (sw[sw.source != 'state_median']
+                   .groupby('state')['sowing_doy_used'].median())
+        else:
+            med = (sw[(sw.harvest_year != year) & (sw.source != 'state_median')]
+                   .groupby('state')['sowing_doy_used'].median())
         out = []
         for fid, yr, st in keys.itertuples(index=False):
             s = src.get((fid, yr), 'state_median')
@@ -125,7 +137,7 @@ def main():
     # cache the re-simulation: it is shared by all four stages
     cache = {}
     for y in YEARS:
-        for v in ['fold_median', 'fold_strict']:
+        for v in ['fold_median', 'fold_strict', 'deterministic']:
             t0 = time.time()
             cache[(y, v)] = resimulate(y, v).set_index(['field_id', 'year'])
             print(f'  resimulated {v:12s} holdout {y}: '
@@ -148,7 +160,8 @@ def main():
             T0.extend(te[tgt].values)
         r2_ml = r2(np.asarray(T0, float), np.asarray(P0, float))
 
-        for variant in ['control', 'fold_median', 'fold_strict']:
+        for variant in ['control', 'fold_median', 'fold_strict',
+                        'deterministic']:
             t0 = time.time()
             T, P = [], []
             for y in sorted(d.year.unique()):
