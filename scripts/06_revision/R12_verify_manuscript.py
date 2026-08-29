@@ -280,7 +280,11 @@ def main():
                      ('\\subsection{Where the information lives',
                       'Discussion subsection heading'),
                      ('\\subsection{Limitations}',
-                      'Discussion subsection heading')]:
+                      'Discussion subsection heading'),
+                     # the archive is re-deposited whenever the code changes;
+                     # each superseded version DOI must leave the manuscript
+                     ('zenodo.21439697', 'superseded archive version (v1)'),
+                     ('zenodo.22162100', 'superseded archive version (v2)')]:
         n = tex.count(bad)
         checks.append((n == 0, f'no "{bad}" ({why})', 0, n))
         print(f'  [{"OK  " if n == 0 else "FAIL"}] absent: {why:38s} count={n}')
