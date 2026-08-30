@@ -1,0 +1,67 @@
+{
+  "stamp": {
+    "pipeline_sha": "76489ae",
+    "n_fields": 5290,
+    "n_field_years": 8461
+  },
+  "panels": {
+    "F3": {
+      "emergence": {
+        "strategy": "C_Hybrid",
+        "model": "LightGBM",
+        "R2": 0.338,
+        "RMSE": 29.39,
+        "n": 4144
+      },
+      "tillering": {
+        "strategy": "B_ML-only",
+        "model": "Ridge",
+        "R2": 0.338,
+        "RMSE": 16.52,
+        "n": 4713
+      },
+      "jointing": {
+        "strategy": "C_Hybrid",
+        "model": "LightGBM",
+        "R2": 0.329,
+        "RMSE": 16.29,
+        "n": 5124
+      },
+      "flag_leaf": {
+        "strategy": "C_Hybrid",
+        "model": "XGBoost",
+        "R2": 0.706,
+        "RMSE": 5.87,
+        "n": 2657
+      },
+      "boot": {
+        "strategy": "C_Hybrid",
+        "model": "LightGBM",
+        "R2": 0.67,
+        "RMSE": 5.6,
+        "n": 2319
+      },
+      "heading": {
+        "strategy": "C_Hybrid",
+        "model": "ElasticNet",
+        "R2": 0.732,
+        "RMSE": 5.5,
+        "n": 2714
+      },
+      "anthesis": {
+        "strategy": "C_Hybrid",
+        "model": "FT",
+        "R2": 0.819,
+        "RMSE": 4.57,
+        "n": 1464
+      },
+      "maturity": {
+        "strategy": "C_Hybrid",
+        "model": "FT",
+        "R2": 0.451,
+        "RMSE": 5.63,
+        "n": 357
+      }
+    }
+  }
+}

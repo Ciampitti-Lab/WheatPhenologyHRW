@@ -88,13 +88,18 @@ def main():
     ft['field_id'] = ft['field_id'].astype(str)
     ft = ft.merge(look[['field_id', 'state_true']], on='field_id', how='left')
     ft = ft.rename(columns={'state_true': 'state'})
-    # New Mexico is shown with Texas, as the nearest study state; the three
-    # centroids outside the study area entirely are excluded.
+    # New Mexico is drawn with Texas, the nearest study state, because nine
+    # fields would not be legible as their own class. The legend must not
+    # therefore report them as Texas: audit item 14 is about exactly this kind
+    # of state misassignment, so the true counts are taken before the merge
+    # and New Mexico is named in the figure note.
+    n_nm = int(ft.loc[ft['state'] == 'NM', 'field_id'].nunique())
+    true_counts = (ft.groupby('state')['field_id'].nunique().to_dict())
     ft['state'] = ft['state'].replace({'NM': 'TX'})
     ft = ft[ft['state'].isin(ORDER)]
     fld = (ft.groupby(['field_id', 'state'])[['latitude', 'longitude']]
              .mean().reset_index())
-    counts = fld.groupby('state')['field_id'].nunique().to_dict()
+    counts = {s: true_counts.get(s, 0) for s in ORDER}   # TX excludes NM
     total = fld['field_id'].nunique()
     print(f'{total} unique fields: ' +
           ', '.join(f'{s} {counts.get(s, 0)}' for s in ORDER))
@@ -172,7 +177,9 @@ def main():
                  fontsize=13, fontweight='bold', pad=12)
     ax.text(0.5, -0.105,
             f'{total:,} winter-wheat fields with at least one ground phenology '
-            f'observation, 2013/14–2016/17.\n'
+            f'observation, 2013/14–2016/17. {n_nm} New Mexico fields are drawn '
+            'in the Texas colour and are\nnever held out as a fold; state is '
+            'assigned by spatial join, not by a latitude box.\n'
             'Albers equal-area conic projection, standard parallels '
             '33°N and 45°N.',
             transform=ax.transAxes, ha='center', va='top', fontsize=8.5,

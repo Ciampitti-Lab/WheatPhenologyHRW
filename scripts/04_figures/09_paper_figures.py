@@ -25,7 +25,12 @@ from matplotlib.colors import TwoSlopeNorm
 WORK = REPO_ROOT / CFG.paths.work_dir
 PHENO = str(REPO_ROOT / CFG.paths.phenology_matched)
 FIG = REPO_ROOT / 'docs' / 'figures'; FIG.mkdir(parents=True, exist_ok=True)
-GRID = WORK / 'v3_results' / 'phase_e_grid.parquet'
+# The corrected seven-model grid. The path this used to carry,
+# v3_results/phase_e_grid.parquet, is the pre-correction five-model run and no
+# longer exists, so F4 could not be regenerated and F3 went stale unnoticed.
+GRID = REPO_ROOT / 'data' / 'revision' / 'R14_grid_full.csv'
+STAMP = {}          # provenance written into every figure PDF, filled in main
+PANELS = {}         # per-panel values, dumped for the assertion test
 GOLD='#CEB888'; ACCENT='#8E6F3E'; DARK='#1B1B1B'; GREY='#8a8a8a'
 TITLE={s:s.replace('_',' ').title() for s in ORDER}
 GROUPS=['WES','HLS phenometrics','MODIS LST','Thermal-time','Daymet meteo','State encoders']
@@ -35,6 +40,17 @@ plt.rcParams.update({'font.size':16,'axes.titlesize':19,'axes.labelsize':17,
     'xtick.labelsize':15,'ytick.labelsize':15,'legend.fontsize':14,
     'figure.titlesize':22,'axes.titleweight':'bold'})
 SEEDS=[0,1,2,3,4]
+
+def save(fig, name):
+    """Write PDF+PNG with the pipeline SHA and cohort size in the metadata,
+    so a stale file is detectable without reading the numbers off it."""
+    meta = {'Subject': '; '.join(f'{k}={v}' for k, v in STAMP.items()),
+            'Creator': 'scripts/04_figures/09_paper_figures.py',
+            'Title': name}
+    fig.savefig(FIG / f'{name}.pdf', bbox_inches='tight', metadata=meta)
+    fig.savefig(FIG / f'{name}.png', dpi=200, bbox_inches='tight')
+    plt.close(fig)
+
 
 def group_of(c):
     if c in WE: return 'WES'
@@ -68,17 +84,18 @@ def F3(fe,cols):
         a.set_title(f'{TITLE[s]}  ({"FT-Transformer" if mod=="FT" else mod})',fontsize=18)
         a.text(.04,.96,f'$R^2$={R:.2f}\nRMSE={rmse:.1f} d\n$n$={len(T)}',transform=a.transAxes,
                va='top',fontsize=15,bbox=dict(boxstyle='round',fc='white',ec=GREY,alpha=.9))
+        PANELS.setdefault('F3',{})[s]=dict(strategy=strat,model=mod,
+            R2=round(float(R),3),RMSE=round(float(rmse),2),n=int(len(T)))
         a.set_xlabel('Observed DOS',fontsize=14); a.set_ylabel('Predicted DOS',fontsize=14)
         a.grid(alpha=.18,lw=.5)
         for sp in('top','right'): a.spines[sp].set_visible(False)
     fig.suptitle('Per-stage predicted vs. observed timing (LOYO, best model per stage)',
                  fontsize=22,fontweight='bold',y=1.005)
     fig.tight_layout()
-    fig.savefig(FIG/'F3_per_stage_scatter.pdf',bbox_inches='tight')
-    fig.savefig(FIG/'F3_per_stage_scatter.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('F3 ok')
+    save(fig,'F3_per_stage_scatter'); print('F3 ok')
 
 def F4():
-    g=pd.read_parquet(GRID)
+    g=pd.read_csv(GRID)
     bv=np.array([g[(g.stage==s)&(g.strategy=='B_ML-only')].R2.max() for s in ORDER])
     cv=np.array([g[(g.stage==s)&(g.strategy=='C_Hybrid')].R2.max() for s in ORDER])
     fig,(a1,a2)=plt.subplots(1,2,figsize=(16.1,6.4),dpi=150,gridspec_kw={'width_ratios':[3,2]})
@@ -106,8 +123,7 @@ def F4():
     a2.grid(True,axis='y',alpha=.2,lw=.5)
     for sp in('top','right'): a2.spines[sp].set_visible(False)
     fig.tight_layout()
-    fig.savefig(FIG/'F4_strategy_comparison.pdf',bbox_inches='tight')
-    fig.savefig(FIG/'F4_strategy_comparison.png',dpi=200,bbox_inches='tight'); plt.close(fig)
+    save(fig,'F4_strategy_comparison')
     print(f'F4 ok (Hybrid {nh}/8)')
 
 def _imp(fe,cols,s):
@@ -161,8 +177,7 @@ def F5(fe,cols):
               columnspacing=1.0,handletextpad=.5)
     for sp in('top','right'): ax.spines[sp].set_visible(False)
     fig.subplots_adjust(bottom=.20)
-    fig.savefig(FIG/'F5_feature_importance.pdf',bbox_inches='tight')
-    fig.savefig(FIG/'F5_feature_importance.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('F5 ok')
+    save(fig,'F5_feature_importance'); print('F5 ok')
 
 def F6(fe,cols):
     M=np.full((8,5),np.nan)
@@ -187,10 +202,26 @@ def F6(fe,cols):
                  fontsize=19,pad=10)
     fig.colorbar(im,ax=ax,shrink=.8,label='$R^2$ (clipped to $[-1,1]$)')
     fig.tight_layout()
-    fig.savefig(FIG/'F6_loso_transferability.pdf',bbox_inches='tight')
-    fig.savefig(FIG/'F6_loso_transferability.png',dpi=200,bbox_inches='tight'); plt.close(fig); print('F6 ok')
+    save(fig,'F6_loso_transferability'); print('F6 ok')
 
 if __name__=='__main__':
-    fe,cols=load_cohort(WORK,PHENO)
-    F4(); F3(fe,cols); F5(fe,cols); F6(fe,cols)
-    print('F3-F6 regenerated into docs/figures/')
+    # F1 and F5 in the manuscript come from scripts/06_revision (R09 and R10)
+    # and are NOT the versions this file draws, so name what you want:
+    #     python -m scripts.04_figures.09_paper_figures F3 F4
+    # With no argument only F3 and F4 are rebuilt, which is what the paper uses
+    # from here. F5/F6 remain available for the record.
+    import subprocess
+    want = [a.upper() for a in sys.argv[1:]] or ['F3', 'F4']
+    fe, cols = load_cohort(WORK, PHENO)
+    sha = subprocess.run(['git', '-C', str(REPO_ROOT), 'rev-parse', '--short', 'HEAD'],
+                         capture_output=True, text=True).stdout.strip()
+    STAMP.update(pipeline_sha=sha, n_fields=int(fe['field_id'].nunique()),
+                 n_field_years=int(len(fe)))
+    print('provenance:', STAMP, flush=True)
+    if 'F4' in want: F4()
+    if 'F3' in want: F3(fe, cols)
+    if 'F5' in want: F5(fe, cols)
+    if 'F6' in want: F6(fe, cols)
+    (FIG / 'panel_values.json').write_text(json.dumps(
+        {'stamp': STAMP, 'panels': PANELS}, indent=2))
+    print(f'regenerated {want} into {FIG}')

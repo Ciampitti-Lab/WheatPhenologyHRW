@@ -17,7 +17,9 @@ from pathlib import Path
 
 import pandas as pd
 
-REV = Path('/home/vmangidi/repositories/WheatPhenologyHRW/data/revision')
+REPO = Path('/home/vmangidi/repositories/WheatPhenologyHRW')
+REV = REPO / 'data' / 'revision'
+sys.path.insert(0, str(REPO))
 GRID = ('/depot/ciampitti/data/WheatPhenologyHRW/data/raw/satellite/'
         'extension_2018_2024/deep_baseline/phaseE_full_grid.parquet')
 TEX = Path(sys.argv[1] if len(sys.argv) > 1
@@ -27,8 +29,11 @@ checks = []
 
 
 def check(label, claimed, actual, tol=0.006):
-    ok = (claimed is not None and actual is not None
-          and abs(float(claimed) - float(actual)) <= tol)
+    if isinstance(claimed, str) or isinstance(actual, str):
+        ok = claimed == actual           # model names compare exactly
+    else:
+        ok = (claimed is not None and actual is not None
+              and abs(float(claimed) - float(actual)) <= tol)
     checks.append((ok, label, claimed, actual))
     print(f'  [{"OK  " if ok else "FAIL"}] {label:52s} '
           f'manuscript={claimed}  source={actual}')
@@ -147,6 +152,53 @@ def main():
         for sig, v in zip((7, 14, 21, 28), (84.5, 87.3, 74.1, 71.0)):
             check(f'Table 5 retained anthesis sigma={sig}', v,
                   round(float(fa.loc[sig, 'pct_retained']), 1), tol=0.06)
+
+    print('\n=== figure panels against their table cells (F3) ===')
+    # A figure generated from a superseded run is invisible to every other
+    # check in this file, because nothing here reads the figure. The
+    # regenerator now dumps what it annotated; this compares it with the cell
+    # the manuscript reports and with the SHA the pipeline was at.
+    import json, subprocess
+    from scripts.utils.deep_models import ADOPT
+    pvp = REPO / 'docs' / 'figures' / 'panel_values.json'
+    if not pvp.exists():
+        checks.append((False, 'F3 panel values present', 'file', 'MISSING'))
+        print('  [FAIL] docs/figures/panel_values.json missing: run '
+              'python -m scripts.04_figures.09_paper_figures F3 F4')
+    else:
+        pv = json.load(open(pvp))
+        gf2 = pd.read_csv(REV / 'R14_grid_full.csv')
+        head = subprocess.run(['git', '-C', str(REPO), 'rev-parse', '--short', 'HEAD'],
+                              capture_output=True, text=True).stdout.strip()
+        check('F3 provenance: cohort fields', 5290, int(pv['stamp']['n_fields']))
+        check('F3 provenance: cohort field-years', 8461,
+              int(pv['stamp']['n_field_years']))
+        stale = pv['stamp']['pipeline_sha'] != head
+        checks.append((not stale, 'F3 regenerated at current HEAD',
+                       head, pv['stamp']['pipeline_sha']))
+        print(f'  [{"OK  " if not stale else "WARN"}] F3 built at '
+              f'{pv["stamp"]["pipeline_sha"]}, HEAD is {head}')
+        for st, pan in pv['panels']['F3'].items():
+            strat, mod = ADOPT[st]
+            cell = gf2[(gf2.stage == st) & (gf2.strategy == strat)
+                       & (gf2.model == mod)].iloc[0]
+            check(f'F3 {st} model', mod, pan['model'])
+            check(f'F3 {st} R2', round(float(cell.R2), 2), round(pan['R2'], 2))
+            check(f'F3 {st} RMSE', round(float(cell.RMSE), 1), round(pan['RMSE'], 1))
+            check(f'F3 {st} n', int(cell.n), int(pan['n']))
+
+    print('\n=== Sec 2.4.2, the three selection rules ===')
+    gs = pd.read_csv(REV / 'R14_grid_full.csv')
+    def cell(st, strat, mod):
+        return gs[(gs.stage == st) & (gs.strategy == strat) & (gs.model == mod)].iloc[0]
+    check('tie-break flag leaf FT', 0.708, round(float(cell('flag_leaf', 'C_Hybrid', 'FT').R2), 3))
+    check('tie-break flag leaf XGBoost', 0.706,
+          round(float(cell('flag_leaf', 'C_Hybrid', 'XGBoost').R2), 3))
+    for st, gap in [('emergence', 0.014), ('boot', 0.019), ('maturity', 0.016)]:
+        d = gs[(gs.stage == st) & (gs.model != 'TabNet')]
+        strat, mod = ADOPT[st]
+        check(f'adopted shortfall vs corrected best, {st}', gap,
+              round(float(d.R2.max() - cell(st, strat, mod).R2), 3))
 
     print('\n=== abstract and highlights ===')
     gf = pd.read_csv(REV / 'R14_grid_full.csv')

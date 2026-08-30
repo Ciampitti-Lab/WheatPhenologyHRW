@@ -1,0 +1,4 @@
+provenance: {'pipeline_sha': '76489ae', 'n_fields': 5290, 'n_field_years': 8461}
+F4 ok (Hybrid 6/8)
+F3 ok
+regenerated ['F3', 'F4'] into /home/vmangidi/repositories/WheatPhenologyHRW/docs/figures
