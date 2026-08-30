@@ -1,0 +1,20 @@
+EVI columns: 3   field-years beyond +/-2.0: 498 (5.9 %)   worst |value| 3.75e+04
+  flag_leaf  XGBoost     control  R2=+0.7061 RMSE=5.87 (3s)
+  boot       LightGBM    control  R2=+0.6704 RMSE=5.60 (1s)
+  heading    ElasticNet  control  R2=+0.7316 RMSE=5.50 (2s)
+  anthesis   FT          control  R2=+0.8191 RMSE=4.57 (131s)
+  flag_leaf  XGBoost     clipped  R2=+0.7104 RMSE=5.83 (3s)
+  boot       LightGBM    clipped  R2=+0.6748 RMSE=5.56 (1s)
+  heading    ElasticNet  clipped  R2=+0.7325 RMSE=5.49 (2s)
+  anthesis   FT          clipped  R2=+0.8203 RMSE=4.55 (145s)
+
+=== effect of clipping the EVI tails ===
+variant    clipped  control   delta
+stage                              
+anthesis    0.8203   0.8191  0.0012
+boot        0.6748   0.6704  0.0044
+flag_leaf   0.7104   0.7061  0.0043
+heading     0.7325   0.7316  0.0009
+
+largest |change| in LOYO R2: 0.0044
+-> data/revision/R17_winsorised_evi.csv (8 rows)

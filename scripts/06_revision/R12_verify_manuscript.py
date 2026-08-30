@@ -173,11 +173,20 @@ def main():
         check('F3 provenance: cohort fields', 5290, int(pv['stamp']['n_fields']))
         check('F3 provenance: cohort field-years', 8461,
               int(pv['stamp']['n_field_years']))
-        stale = pv['stamp']['pipeline_sha'] != head
-        checks.append((not stale, 'F3 regenerated at current HEAD',
-                       head, pv['stamp']['pipeline_sha']))
-        print(f'  [{"OK  " if not stale else "WARN"}] F3 built at '
-              f'{pv["stamp"]["pipeline_sha"]}, HEAD is {head}')
+        # Keying staleness on HEAD alone cries wolf: every later commit, however
+        # unrelated, would flag a figure whose content cannot have changed.
+        # Ask the narrower question instead, whether anything that determines
+        # what the figure draws has moved since it was built.
+        DETERMINES = ['scripts/utils/deep_models.py',
+                      'scripts/04_figures/09_paper_figures.py']
+        built = pv['stamp']['pipeline_sha']
+        moved = subprocess.run(['git', '-C', str(REPO), 'diff', '--name-only',
+                                built, 'HEAD', '--'] + DETERMINES,
+                               capture_output=True, text=True).stdout.split()
+        checks.append((not moved, 'F3 built from the current modelling code',
+                       'no change', ', '.join(moved) or 'no change'))
+        print(f'  [{"OK  " if not moved else "FAIL"}] F3 built at {built}'
+              f' (HEAD {head}); inputs changed since: {moved or "none"}')
         for st, pan in pv['panels']['F3'].items():
             strat, mod = ADOPT[st]
             cell = gf2[(gf2.stage == st) & (gf2.strategy == strat)
@@ -199,6 +208,16 @@ def main():
         strat, mod = ADOPT[st]
         check(f'adopted shortfall vs corrected best, {st}', gap,
               round(float(d.R2.max() - cell(st, strat, mod).R2), 3))
+
+    print('\n=== audit item 13, EVI tails clipped (R17) ===')
+    w = pd.read_csv(REV / 'R17_winsorised_evi.csv')
+    wp = w.pivot_table(index='stage', columns='variant', values='R2')
+    check('EVI clip: largest |change| in LOYO R2', 0.0044,
+          round(float((wp['clipped'] - wp['control']).abs().max()), 4), tol=0.0002)
+    for st, c, k in [('flag_leaf', 0.706, 0.710), ('boot', 0.670, 0.675),
+                     ('heading', 0.732, 0.733), ('anthesis', 0.819, 0.820)]:
+        check(f'EVI clip {st} control', c, round(float(wp.loc[st, 'control']), 3))
+        check(f'EVI clip {st} clipped', k, round(float(wp.loc[st, 'clipped']), 3))
 
     print('\n=== abstract and highlights ===')
     gf = pd.read_csv(REV / 'R14_grid_full.csv')
