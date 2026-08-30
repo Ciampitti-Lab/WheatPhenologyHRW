@@ -159,7 +159,7 @@ def main():
     # regenerator now dumps what it annotated; this compares it with the cell
     # the manuscript reports and with the SHA the pipeline was at.
     import json, subprocess
-    from scripts.utils.deep_models import ADOPT
+    from scripts.utils.deep_models import ADOPT, ORDER as ORDER_
     pvp = REPO / 'docs' / 'figures' / 'panel_values.json'
     if not pvp.exists():
         checks.append((False, 'F3 panel values present', 'file', 'MISSING'))
@@ -218,6 +218,29 @@ def main():
                      ('heading', 0.732, 0.733), ('anthesis', 0.819, 0.820)]:
         check(f'EVI clip {st} control', c, round(float(wp.loc[st, 'control']), 3))
         check(f'EVI clip {st} clipped', k, round(float(wp.loc[st, 'clipped']), 3))
+
+    print('\n=== Supplementary S1, every cell of the full grid ===')
+    # The submitted S1 was pre-correction in 67 of its 112 R2 cells and nothing
+    # here read it, because it is the only table reporting the grid itself
+    # rather than a quantity derived from it.
+    from scripts.utils.deep_models import MODELS
+    supp = (TEX.parent / 'sections' / 'supplementary.tex')
+    if not supp.exists():
+        supp = TEX.parent / 'supplementary.tex'
+    body = supp.read_text()
+    gg = pd.read_csv(REV / 'R14_grid_full.csv').set_index(['stage', 'strategy', 'model'])
+    miss = 0
+    for st in ORDER_:
+        for m in MODELS:
+            for arm in ('B_ML-only', 'C_Hybrid'):
+                r = gg.loc[(st, arm, m)]
+                cell = f'{r.R2:.2f}'
+                ast = f'{cell}$^{{\\ast}}$'
+                if (cell not in body) and (ast not in body):
+                    miss += 1
+    checks.append((miss == 0, 'S1 grid cells present in the supplement', 0, miss))
+    print(f'  [{"OK  " if miss == 0 else "FAIL"}] S1: {112 - miss}/112 grid values '
+          f'appear in the supplement')
 
     print('\n=== abstract and highlights ===')
     gf = pd.read_csv(REV / 'R14_grid_full.csv')
