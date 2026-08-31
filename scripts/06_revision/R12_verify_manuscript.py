@@ -107,8 +107,8 @@ def main():
     rep = ['flag_leaf', 'boot', 'heading', 'anthesis']
     lo = r2f.loc[rep, 'pct_of_error_explained'].min()
     hi = r2f.loc[rep, 'pct_of_error_explained'].max()
-    check('text: reproductive floor lower %', 80, round(lo), tol=0.6)
-    check('text: reproductive floor upper %', 119, round(hi), tol=0.6)
+    check('text: reproductive floor lower %', 79, round(lo), tol=0.6)
+    check('text: reproductive floor upper %', 115, round(hi), tol=0.6)
 
     print('\n=== Table 8, held-out-state shift (R04) ===')
     sh = pd.read_csv(REV / 'R14_state_shift.csv')
@@ -241,6 +241,27 @@ def main():
     checks.append((miss == 0, 'S1 grid cells present in the supplement', 0, miss))
     print(f'  [{"OK  " if miss == 0 else "FAIL"}] S1: {112 - miss}/112 grid values '
           f'appear in the supplement')
+
+    print('\n=== Table 7, the visit-interval bound (R02) ===')
+    # The model-RMSE column of Table 7 was hardcoded from the submitted table
+    # and survived the state correction, so it disagreed with Table 3 at five
+    # stages and the ratio derived from it reached the abstract. R02 now reads
+    # it from the adopted grid cell; this check ties the two tables together.
+    lb = pd.read_csv(REV / 'R02_label_uncertainty.csv').set_index('stage')
+    gl = pd.read_csv(REV / 'R14_grid_full.csv')
+    for st in ORDER_:
+        strat, mod = ADOPT[st]
+        cell = gl[(gl.stage == st) & (gl.strategy == strat) & (gl.model == mod)].iloc[0]
+        check(f'T7 model RMSE == Table 3, {st}', round(float(cell.RMSE), 1),
+              round(float(lb.loc[st, 'model_RMSE']), 1))
+    rep = ['flag_leaf', 'boot', 'heading', 'anthesis']
+    pct = [float(lb.loc[s, 'pct_of_error_explained']) for s in rep]
+    check('reproductive floor/RMSE min (%)', 79, round(min(pct)), tol=0.6)
+    check('reproductive floor/RMSE max (%)', 115, round(max(pct)), tol=0.6)
+    for claim in [r'\SIrange{79}{115}{\percent}']:
+        c = tex.count(claim)
+        checks.append((c >= 1, f'present: "{claim}"', 1, c))
+        print(f'  [{"OK  " if c >= 1 else "FAIL"}] present: {claim:32s} count={c}')
 
     print('\n=== abstract and highlights ===')
     gf = pd.read_csv(REV / 'R14_grid_full.csv')

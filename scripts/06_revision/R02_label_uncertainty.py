@@ -32,7 +32,8 @@ Three diagnostics:
 Output: data/revision/R02_label_uncertainty.csv
         data/revision/R02_order_violations.csv
 """
-from _common import ORDER, PHENO, STAGE_LABEL, STAGE_MAP, SPRING, save
+from _common import ORDER, PHENO, STAGE_LABEL, STAGE_MAP, SPRING, save, OUT
+from scripts.utils.deep_models import ADOPT
 import numpy as np
 import pandas as pd
 
@@ -103,10 +104,16 @@ def main():
             repeat_span_mean=rep.mean() if len(rep) else np.nan))
 
     u = pd.DataFrame(rows)
-    # model RMSE from the submitted Table 2, for the noise-floor comparison
-    u['model_RMSE'] = u.stage.map(dict(emergence=29.0, tillering=16.5, jointing=16.2,
-                                       flag_leaf=5.8, boot=5.4, heading=5.5,
-                                       anthesis=4.6, maturity=5.7))
+    # Model RMSE for the noise-floor comparison. This was hardcoded from the
+    # table as submitted, so it survived the state correction of audit item 14
+    # and left Table 7 disagreeing with Table 3 at five stages. Read it from
+    # the adopted cell of the grid instead, so it cannot drift again.
+    grid = pd.read_csv(OUT / 'R14_grid_full.csv')
+    rmse = {}
+    for st, (strat, mod) in ADOPT.items():
+        c = grid[(grid.stage == st) & (grid.strategy == strat) & (grid.model == mod)]
+        rmse[st] = round(float(c.RMSE.iloc[0]), 1)
+    u['model_RMSE'] = u.stage.map(rmse)
     # a visit-interval-limited RMSE floor: onset uniform on the bracket
     u['rmse_floor'] = u.interval_mean / np.sqrt(12)
     u['pct_of_error_explained'] = 100 * u.rmse_floor / u.model_RMSE
