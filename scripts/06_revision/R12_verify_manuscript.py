@@ -374,6 +374,68 @@ def main():
     check('LOSO reproductive minimum', -0.18, round(rep4.R2.min(), 2), tol=0.006)
     check('LOSO reproductive maximum', 0.59, round(rep4.R2.max(), 2), tol=0.006)
 
+    print('\n=== response document against the same sources ===')
+    # R12 verified only the article and the supplement, so the response letter
+    # was the one document nobody was checking; six figures in it had gone
+    # stale by the time the analyses were re-run. Tie the quantities it shares
+    # with the manuscript to the files that produce them.
+    rsp_path = TEX.parent / 'response.tex'
+    if not rsp_path.exists():
+        print('  [SKIP] response.tex not found beside the manuscript')
+    else:
+        rsp = rsp_path.read_text()
+        gg2 = pd.read_csv(REV / 'R14_grid_full.csv')
+        lb2 = pd.read_csv(REV / 'R02_label_uncertainty.csv').set_index('stage')
+        st2 = pd.read_csv(REV / 'R14_state_lookup.csv')
+        d5 = pd.read_csv(REV / 'R05_fold_derived_sowing.csv')
+
+        def cell(stage, strat, mod, col='R2'):
+            r = gg2[(gg2.stage == stage) & (gg2.strategy == strat)
+                    & (gg2.model == mod)]
+            return round(float(r[col].iloc[0]), 3)
+
+        want = []
+        # pre-specified single model, and what per-stage selection buys
+        want.append(('pre-specified worst cell', '0.268'))
+        want.append(('pre-specified grid minimum', '0.233'))
+        want.append(('anthesis selected', f"{cell('anthesis','C_Hybrid','FT'):.3f}"))
+        want.append(('anthesis pre-specified', '0.691'))
+        want.append(('tillering selected', f"{cell('tillering','B_ML-only','Ridge'):.3f}"))
+        # model-fixed ablation costs quoted to Reviewer 4.3
+        for lbl, st in [('anthesis FT control', 'anthesis'), ('heading control', 'heading')]:
+            c = d5[(d5.stage == st) & (d5.variant == 'control')]
+            if len(c):
+                want.append((lbl, f"{float(c.gain.iloc[0]):.3f}"))
+        # Nebraska field count after the spatial join
+        ne = int(st2.state_true.value_counts().get('NE', 0))
+        want.append(('Nebraska fields', str(ne)))
+        # the visit-interval ratio
+        rep2 = ['flag_leaf', 'boot', 'heading', 'anthesis']
+        pc = [float(lb2.loc[x, 'pct_of_error_explained']) for x in rep2]
+        want.append(('label-bound low', str(round(min(pc)))))
+        want.append(('label-bound high', str(round(max(pc)))))
+
+        for lbl, val in want:
+            n_ = rsp.count(val)
+            checks.append((n_ >= 1, f'response cites {lbl} = {val}', 1, n_))
+            print(f'  [{"OK  " if n_ >= 1 else "FAIL"}] response cites {lbl:26s} = {val}')
+
+        for bad, why in [('selected 26 times', 'superseded nested-CV tally'),
+                         ('every single fold', 'superseded reproductive-fold claim'),
+                         ('0.225', 'superseded pre-specified minimum'),
+                         ('0.700', 'superseded pre-specified anthesis'),
+                         ('0.803', 'superseded selected anthesis'),
+                         ('0.270', 'superseded pre-specified tillering'),
+                         ('{88}{98}', 'superseded deterministic retention'),
+                         ('num{0.025}', 'superseded anthesis control gain'),
+                         ('num{0.102}', 'superseded ElasticNet anthesis gain'),
+                         ('(57 fields)', 'superseded Nebraska count'),
+                         ('{80}{119}', 'superseded label-bound ratio'),
+                         ('group-digits', 'siunitx option that prints 0.004,4')]:
+            n_ = rsp.count(bad)
+            checks.append((n_ == 0, f'response free of {why}', 0, n_))
+            print(f'  [{"OK  " if n_ == 0 else "FAIL"}] response free of {why:38s} count={n_}')
+
     print('\n=== em dashes and stale claims in the .tex ===')
     for bad, why in [('---', 'em dash'),
                      ('strictly by held-out', 'old selection-rule wording'),
